@@ -19,4 +19,9 @@
       <ProjectReference Include="..\Tadbeer.DAL\Tadbeer.DAL.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\background.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\exampleJsInterop.js" />
+    </ItemGroup>
+
 </Project>
