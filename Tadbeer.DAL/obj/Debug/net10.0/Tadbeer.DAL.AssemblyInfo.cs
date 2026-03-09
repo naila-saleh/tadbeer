@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Tadbeer.DAL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9dc042cec88a851b01ee9e34176c16218fb82160")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9ff2466966be128f6d7f8d40bc3333bcfa3cac09")]
 [assembly: System.Reflection.AssemblyProductAttribute("Tadbeer.DAL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Tadbeer.DAL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

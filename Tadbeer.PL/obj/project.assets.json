@@ -632,6 +632,39 @@
           }
         }
       },
+      "Mapster/7.4.0": {
+        "type": "package",
+        "dependencies": {
+          "Mapster.Core": "1.2.1"
+        },
+        "compile": {
+          "lib/net7.0/Mapster.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/Mapster.dll": {}
+        }
+      },
+      "Mapster.Core/1.2.1": {
+        "type": "package",
+        "compile": {
+          "lib/net7.0/Mapster.Core.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/Mapster.Core.dll": {}
+        }
+      },
+      "Mapster.DependencyInjection/1.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Mapster": "7.4.0"
+        },
+        "compile": {
+          "lib/net7.0/Mapster.DependencyInjection.dll": {}
+        },
+        "runtime": {
+          "lib/net7.0/Mapster.DependencyInjection.dll": {}
+        }
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer/10.0.3": {
         "type": "package",
         "dependencies": {
@@ -2414,6 +2447,8 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
+          "Mapster": "7.4.0",
+          "Mapster.DependencyInjection": "1.0.1",
           "Tadbeer.DAL": "1.0.0"
         },
         "compile": {
@@ -3225,6 +3260,48 @@
         "lib/netstandard1.0/zh-Hant/Humanizer.resources.dll",
         "lib/netstandard2.0/zh-Hant/Humanizer.resources.dll",
         "logo.png"
+      ]
+    },
+    "Mapster/7.4.0": {
+      "sha512": "RYGoDqvS4WTKIq0HDyPBBVIj6N0mluOCXQ1Vk95JKseMHEsbCXSEGKSlP95oL+s42IXAXbqvHj7p0YaRBUcfqg==",
+      "type": "package",
+      "path": "mapster/7.4.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net6.0/Mapster.dll",
+        "lib/net7.0/Mapster.dll",
+        "mapster.7.4.0.nupkg.sha512",
+        "mapster.nuspec"
+      ]
+    },
+    "Mapster.Core/1.2.1": {
+      "sha512": "11lokmfliBEMMmjeqxFGNpqGXq6tN96zFqpBmfYeahr4Ybk63oDmeJmOflsATjobYkX248g5Y62oQ2NNnZaeww==",
+      "type": "package",
+      "path": "mapster.core/1.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net6.0/Mapster.Core.dll",
+        "lib/net7.0/Mapster.Core.dll",
+        "mapster.core.1.2.1.nupkg.sha512",
+        "mapster.core.nuspec"
+      ]
+    },
+    "Mapster.DependencyInjection/1.0.1": {
+      "sha512": "LfjnRIwx6WAo3ssq8PFeaHFaUz00BfSG9BhWgXsiDa3H5lDhG0lpMGDF6w2ZnooS4eHYmAv4f77VxmzpvgorNg==",
+      "type": "package",
+      "path": "mapster.dependencyinjection/1.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net6.0/Mapster.DependencyInjection.dll",
+        "lib/net7.0/Mapster.DependencyInjection.dll",
+        "mapster.dependencyinjection.1.0.1.nupkg.sha512",
+        "mapster.dependencyinjection.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/10.0.3": {

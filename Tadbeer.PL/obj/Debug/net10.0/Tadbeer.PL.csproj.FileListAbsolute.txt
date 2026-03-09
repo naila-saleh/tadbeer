@@ -71,7 +71,6 @@ D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\rjimswa.dswa.cach
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\scopedcss\bundle\Tadbeer.PL.styles.css
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\compressed\1n4tv8escj-{0}-p2ljon106a-p2ljon106a.gz
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\staticwebassets.build.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\staticwebassets.build.json.cache
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\staticwebassets.development.json
@@ -283,3 +282,7 @@ D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\bin\Debug\net10.0\ru\Microsoft.Code
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\bin\Debug\net10.0\tr\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\bin\Debug\net10.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\bin\Debug\net10.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\bin\Debug\net10.0\Mapster.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\bin\Debug\net10.0\Mapster.Core.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\bin\Debug\net10.0\Mapster.DependencyInjection.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.PL\obj\Debug\net10.0\Tadbeer.PL.sourcelink.json

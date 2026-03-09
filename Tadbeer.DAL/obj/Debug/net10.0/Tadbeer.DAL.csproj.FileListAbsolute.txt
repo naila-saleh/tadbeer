@@ -4,8 +4,6 @@ D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\bin\Debug\net10.0\Tadbeer.DAL.deps
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\bin\Debug\net10.0\Tadbeer.DAL.runtimeconfig.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\bin\Debug\net10.0\Tadbeer.DAL.dll
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\bin\Debug\net10.0\Tadbeer.DAL.pdb
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\EmbeddedAttribute.cs
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\ValidatableTypeAttribute.cs
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.csproj.AssemblyReference.cache
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\rpswa.dswa.cache.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.GeneratedMSBuildEditorConfig.editorconfig
@@ -15,12 +13,7 @@ D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.cspr
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\rjimswa.dswa.cache.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\scopedcss\Component1.razor.rz.scp.css
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\scopedcss\bundle\Tadbeer.DAL.styles.css
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\scopedcss\projectbundle\Tadbeer.DAL.bundle.scp.css
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\compressed\lvokpuhklc-{0}-6pqz8bsss0-6pqz8bsss0.gz
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\compressed\foy8m55iu3-{0}-t5ii2etl8a-t5ii2etl8a.gz
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\compressed\dkej0aqsxp-{0}-t5ii2etl8a-t5ii2etl8a.gz
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\staticwebassets.build.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\staticwebassets.build.json.cache
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\staticwebassets.development.json
@@ -37,3 +30,4 @@ D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\refint\Tadbeer.D
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.pdb
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.genruntimeconfig.cache
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\ref\Tadbeer.DAL.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.sourcelink.json

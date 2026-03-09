@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "CiOXSea+/8g=",
+  "dgSpecHash": "lVY04qkWBDI=",
   "success": true,
   "projectFilePath": "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.PL\\Tadbeer.PL.csproj",
   "expectedPackageFiles": [
@@ -56,6 +56,9 @@
     "C:\\Users\\hp\\.nuget\\packages\\humanizer.core.zh-cn\\2.14.1\\humanizer.core.zh-cn.2.14.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\humanizer.core.zh-hans\\2.14.1\\humanizer.core.zh-hans.2.14.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\humanizer.core.zh-hant\\2.14.1\\humanizer.core.zh-hant.2.14.1.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\mapster\\7.4.0\\mapster.7.4.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\mapster.core\\1.2.1\\mapster.core.1.2.1.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\mapster.dependencyinjection\\1.0.1\\mapster.dependencyinjection.1.0.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\10.0.3\\microsoft.aspnetcore.authentication.jwtbearer.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.openidconnect\\10.0.3\\microsoft.aspnetcore.authentication.openidconnect.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.identity.entityframeworkcore\\10.0.3\\microsoft.aspnetcore.identity.entityframeworkcore.10.0.3.nupkg.sha512",

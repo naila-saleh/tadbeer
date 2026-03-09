@@ -1,11 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "fDSGuk/KWvQ=",
+  "dgSpecHash": "Ee4hfoQPPlw=",
   "success": true,
   "projectFilePath": "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.BLL\\Tadbeer.BLL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\hp\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\mapster\\7.4.0\\mapster.7.4.0.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\mapster.core\\1.2.1\\mapster.core.1.2.1.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\mapster.dependencyinjection\\1.0.1\\mapster.dependencyinjection.1.0.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authorization\\10.0.3\\microsoft.aspnetcore.authorization.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.components\\10.0.3\\microsoft.aspnetcore.components.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\10.0.3\\microsoft.aspnetcore.components.analyzers.10.0.3.nupkg.sha512",
