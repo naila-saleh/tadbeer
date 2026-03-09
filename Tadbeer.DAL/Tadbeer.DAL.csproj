@@ -28,6 +28,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="DTO\Requests\" />
+      <Folder Include="DTO\Responses\" />
       <Folder Include="Repositories\Classes\" />
       <Folder Include="Repositories\Interfaces\" />
     </ItemGroup>
