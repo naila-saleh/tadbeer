@@ -23,12 +23,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Migrations\" />
+      <_ContentIncludedByDefault Remove="wwwroot\background.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\exampleJsInterop.js" />
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="wwwroot\background.png" />
-      <_ContentIncludedByDefault Remove="wwwroot\exampleJsInterop.js" />
+      <Folder Include="Repositories\Classes\" />
+      <Folder Include="Repositories\Interfaces\" />
     </ItemGroup>
 
 </Project>
