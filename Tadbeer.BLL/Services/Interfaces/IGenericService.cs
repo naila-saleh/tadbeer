@@ -10,12 +10,12 @@ public interface IGenericService<TRequest, TResponse, TEntity>
     where TResponse : class
     where TEntity : class
 {
-    Task<TResponse?> GetByIdAsync(object id);
+    Task<TResponse?> GetByIdAsync(params object[] ids);
     Task<IEnumerable<TResponse>> GetAllAsync();
     Task<IEnumerable<TResponse>> FindAsync(Expression<Func<TEntity, bool>> predicate);
     Task<TResponse> AddAsync(TRequest dto);
     Task<IEnumerable<TResponse>> AddRangeAsync(IEnumerable<TRequest> dtos);
-    Task UpdateAsync(object id, TRequest dto);
-    Task RemoveAsync(object id);
-    Task RemoveRangeAsync(IEnumerable<object> ids);
+    Task UpdateAsync(TRequest dto, params object[] ids);
+    Task RemoveAsync(params object[] ids);
+    Task RemoveRangeAsync(IEnumerable<object[]> idsCollection);
 }

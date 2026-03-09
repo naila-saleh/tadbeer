@@ -757,6 +757,9 @@
             "projectReferences": {
               "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.BLL\\Tadbeer.BLL.csproj": {
                 "projectPath": "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.BLL\\Tadbeer.BLL.csproj"
+              },
+              "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.DAL\\Tadbeer.DAL.csproj": {
+                "projectPath": "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.DAL\\Tadbeer.DAL.csproj"
               }
             }
           }

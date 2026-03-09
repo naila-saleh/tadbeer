@@ -6409,7 +6409,8 @@
       "Microsoft.AspNetCore.OpenApi >= 10.0.3",
       "Microsoft.EntityFrameworkCore.Tools >= 10.0.3",
       "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 10.0.2",
-      "Tadbeer.BLL >= 1.0.0"
+      "Tadbeer.BLL >= 1.0.0",
+      "Tadbeer.DAL >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -6447,6 +6448,9 @@
           "projectReferences": {
             "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.BLL\\Tadbeer.BLL.csproj": {
               "projectPath": "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.BLL\\Tadbeer.BLL.csproj"
+            },
+            "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.DAL\\Tadbeer.DAL.csproj": {
+              "projectPath": "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.DAL\\Tadbeer.DAL.csproj"
             }
           }
         }

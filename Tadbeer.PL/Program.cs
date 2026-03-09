@@ -2,10 +2,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Tadbeer.DAL.Data;
 using Tadbeer.DAL.Models;
-using Tadbeer.DAL.Repositories.Classes;
-using Tadbeer.DAL.Repositories.Interfaces;
+using Tadbeer.PL.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
 
 builder.Services
     .AddIdentityCore<ApplicationUser>(options =>
@@ -15,13 +16,20 @@ builder.Services
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddAuthorization();
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register custom mappings (Mapster)
+Tadbeer.BLL.Profiles.MapsterConfig.RegisterMappings();
+
+// Register all Repositories, UnitOfWork, and Services from the BLL/DAL
+builder.Services.AddApplicationServices();
 
 // Add CORS only if you need cross-origin browser requests
 const string userPolicy = "UserPolicy";
@@ -52,5 +60,7 @@ app.UseCors(userPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();

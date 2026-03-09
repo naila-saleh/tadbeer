@@ -47,7 +47,7 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("Role", (string)null);
+                    b.ToTable("AspNetRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -71,7 +71,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaim", (string)null);
+                    b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -95,7 +95,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaim", (string)null);
+                    b.ToTable("AspNetUserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
@@ -116,7 +116,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogin", (string)null);
+                    b.ToTable("AspNetUserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
@@ -131,7 +131,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole", (string)null);
+                    b.ToTable("AspNetUserRoles", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -150,7 +150,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserToken", (string)null);
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.AIDetection", b =>
@@ -161,39 +161,32 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.Property<decimal>("ConfidenceScore")
                         .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)")
-                        .HasColumnName("confidence_score");
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ImagePath")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("image_path");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<Guid>("PredictedSpecialtyId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("predicted_specialty_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("aidetection_id_primary");
+                    b.HasKey("Id");
 
                     b.HasIndex("PredictedSpecialtyId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AIDetection", (string)null);
+                    b.ToTable("AIDetections");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.ApplicationUser", b =>
@@ -206,50 +199,42 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<long?>("AvgRating")
-                        .HasColumnType("bigint")
-                        .HasColumnName("avg_rating");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("City")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("city");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("email");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
                     b.Property<long?>("ExperienceYears")
-                        .HasColumnType("bigint")
-                        .HasColumnName("experience_years");
+                        .HasColumnType("bigint");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("first_name");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("JobDescription")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("job_description");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("last_name");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -258,19 +243,15 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("email_normalized");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("username_normalized");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("PasswordHash")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("password_hash");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
@@ -281,16 +262,14 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.Property<string>("ProfileImage")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("profile_image");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
-                        .HasDefaultValue("User")
-                        .HasColumnName("role");
+                        .HasDefaultValue("User");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
@@ -300,33 +279,23 @@ namespace Tadbeer.DAL.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
-                        .HasDefaultValue("Existed")
-                        .HasColumnName("status");
+                        .HasDefaultValue("Existed");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("username");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AvgRating")
-                        .HasDatabaseName("applicationuser_avg_rating_index");
+                    b.HasIndex("AvgRating");
 
-                    b.HasIndex("City")
-                        .HasDatabaseName("applicationuser_city_index");
-
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("applicationuser_email_unique")
-                        .HasFilter("[email] IS NOT NULL");
+                    b.HasIndex("City");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -334,24 +303,17 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[username_normalized] IS NOT NULL");
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("UserName")
-                        .IsUnique()
-                        .HasDatabaseName("applicationuser_username_unique")
-                        .HasFilter("[username] IS NOT NULL");
+                    b.HasIndex("City", "Role");
 
-                    b.HasIndex("City", "Role")
-                        .HasDatabaseName("applicationuser_city_role_index");
+                    b.HasIndex("Role", "Status");
 
-                    b.HasIndex("Role", "Status")
-                        .HasDatabaseName("applicationuser_role_status_index");
-
-                    b.ToTable("ApplicationUser", null, t =>
+                    b.ToTable("AspNetUsers", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ApplicationUser_Role", "[role] IN ('admin','worker','user')");
+                            t.HasCheckConstraint("CK_ApplicationUser_Role", "[Role] IN ('Admin','Worker','User')");
 
-                            t.HasCheckConstraint("CK_ApplicationUser_Status", "[status] IN ('existed','deleted')");
+                            t.HasCheckConstraint("CK_ApplicationUser_Status", "[Status] IN ('Existed','Deleted')");
                         });
                 });
 
@@ -362,54 +324,43 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("BookingDate")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("booking_date");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
-                        .HasDefaultValue("Pending")
-                        .HasColumnName("status");
+                        .HasDefaultValue("Pending");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("user_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("WorkerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("worker_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("WorkingHourId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("working_hour_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("bookings_id_primary");
+                    b.HasKey("Id");
 
-                    b.HasIndex("Status")
-                        .HasDatabaseName("bookings_status_index");
+                    b.HasIndex("Status");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("bookings_user_id_index");
+                    b.HasIndex("UserId");
 
-                    b.HasIndex("WorkerId")
-                        .HasDatabaseName("bookings_worker_id_index");
+                    b.HasIndex("WorkerId");
 
                     b.HasIndex("WorkingHourId");
 
-                    b.ToTable("Bookings", null, t =>
+                    b.ToTable("Bookings", t =>
                         {
-                            t.HasCheckConstraint("CK_Bookings_Status", "[status] IN ('pending','accepted','rejected','completed','cancelled')");
+                            t.HasCheckConstraint("CK_Bookings_Status", "[Status] IN ('Pending','Accepted','Rejected','Completed','Cancelled')");
                         });
                 });
 
@@ -422,24 +373,19 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.Property<string>("Number")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("phone_number");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<Guid>("WorkerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("worker_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("phonenumber_id_primary");
+                    b.HasKey("Id");
 
                     b.HasIndex("Number")
-                        .IsUnique()
-                        .HasDatabaseName("phonenumber_phone_number_unique");
+                        .IsUnique();
 
-                    b.HasIndex("WorkerId")
-                        .HasDatabaseName("phonenumber_worker_id_index");
+                    b.HasIndex("WorkerId");
 
-                    b.ToTable("PhoneNumber", (string)null);
+                    b.ToTable("PhoneNumbers");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.Review", b =>
@@ -449,35 +395,28 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("BookingId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("booking_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("comment");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<byte>("Rate")
-                        .HasColumnType("tinyint")
-                        .HasColumnName("rate");
+                        .HasColumnType("tinyint");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("review_id_primary");
+                    b.HasKey("Id");
 
                     b.HasIndex("BookingId")
-                        .IsUnique()
-                        .HasDatabaseName("review_booking_id_index");
+                        .IsUnique();
 
-                    b.ToTable("Review", null, t =>
+                    b.ToTable("Reviews", t =>
                         {
-                            t.HasCheckConstraint("CK_Review_Rate", "[rate] BETWEEN 1 AND 5");
+                            t.HasCheckConstraint("CK_Review_Rate", "[Rate] BETWEEN 1 AND 5");
                         });
                 });
 
@@ -490,13 +429,11 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("name");
+                        .HasColumnType("nvarchar(255)");
 
-                    b.HasKey("Id")
-                        .HasName("specialty_id_primary");
+                    b.HasKey("Id");
 
-                    b.ToTable("Specialty", (string)null);
+                    b.ToTable("Specialties");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkImage", b =>
@@ -506,30 +443,24 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("image_url");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("WorkerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("worker_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("workimage_id_primary");
+                    b.HasKey("Id");
 
-                    b.HasIndex("WorkerId")
-                        .HasDatabaseName("workimage_worker_id_index");
+                    b.HasIndex("WorkerId");
 
-                    b.ToTable("WorkImage", (string)null);
+                    b.ToTable("WorkImages");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkSubImage", b =>
@@ -541,38 +472,31 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("image_url");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<Guid>("MainImageId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("main_image_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("worksubimages_id_primary");
+                    b.HasKey("Id");
 
-                    b.HasIndex("MainImageId")
-                        .HasDatabaseName("worksubimages_main_image_id_index");
+                    b.HasIndex("MainImageId");
 
-                    b.ToTable("WorkSubImages", (string)null);
+                    b.ToTable("WorkSubImages");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkerSpecialty", b =>
                 {
                     b.Property<Guid>("WorkerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("worker_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SpecialtyId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("specialty_id");
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("WorkerId", "SpecialtyId");
 
-                    b.HasIndex("SpecialtyId")
-                        .HasDatabaseName("workerspecialty_specialty_id_index");
+                    b.HasIndex("SpecialtyId");
 
-                    b.ToTable("WorkerSpecialty", (string)null);
+                    b.ToTable("WorkerSpecialties");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkingHours", b =>
@@ -584,29 +508,24 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.Property<string>("DayOfWeek")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("day_of_week");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<TimeOnly>("EndTime")
-                        .HasColumnType("time")
-                        .HasColumnName("end_time");
+                        .HasColumnType("time");
 
                     b.Property<TimeOnly>("StartTime")
-                        .HasColumnType("time")
-                        .HasColumnName("start_time");
+                        .HasColumnType("time");
 
                     b.Property<Guid>("WorkerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("worker_id");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("workinghours_id_primary");
+                    b.HasKey("Id");
 
                     b.HasIndex("WorkerId");
 
-                    b.ToTable("WorkingHours", null, t =>
+                    b.ToTable("WorkingHours", t =>
                         {
-                            t.HasCheckConstraint("CK_WorkingHours_DayOfWeek", "[day_of_week] IN ('Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday')");
+                            t.HasCheckConstraint("CK_WorkingHours_DayOfWeek", "[DayOfWeek] IN ('Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday')");
                         });
                 });
 

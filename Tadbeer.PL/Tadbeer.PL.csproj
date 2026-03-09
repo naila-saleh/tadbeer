@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.3" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Tadbeer.BLL\Tadbeer.BLL.csproj" />
+      <ProjectReference Include="..\Tadbeer.DAL\Tadbeer.DAL.csproj" />
     </ItemGroup>
 
 </Project>

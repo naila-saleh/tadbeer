@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Tadbeer.BLL.props" />
-</Project>

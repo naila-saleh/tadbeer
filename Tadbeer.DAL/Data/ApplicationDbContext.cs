@@ -47,6 +47,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.HasIndex(x => new { x.City, x.Role });
             e.HasIndex(x => x.AvgRating);
             e.HasIndex(x => x.City);
+
+            e.HasCheckConstraint(
+                "CK_ApplicationUser_Role",
+                "[Role] IN ('Admin','Worker','User')"
+            );
+
+            e.HasCheckConstraint(
+                "CK_ApplicationUser_Status",
+                "[Status] IN ('Existed','Deleted')"
+            );
         });
 
         builder.Entity<Specialty>(e =>
@@ -113,6 +123,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.HasOne(x => x.Worker)
                 .WithMany(x => x.WorkingHours)
                 .HasForeignKey(x => x.WorkerId);
+
+            e.HasCheckConstraint(
+                "CK_WorkingHours_DayOfWeek",
+                "[DayOfWeek] IN ('Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday')"
+            );
         });
 
         builder.Entity<Booking>(e =>
@@ -128,7 +143,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
             e.HasCheckConstraint(
                 "CK_Bookings_Status",
-                "[status] IN ('pending','accepted','rejected','completed','cancelled')"
+                "[Status] IN ('Pending','Accepted','Rejected','Completed','Cancelled')"
             );
 
             e.HasOne(x => x.User)

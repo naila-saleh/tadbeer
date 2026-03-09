@@ -22,9 +22,9 @@ public class GenericService<TRequest, TResponse, TEntity> : IGenericService<TReq
         _repository = repository;
     }
 
-    public async Task<TResponse?> GetByIdAsync(object id)
+    public async Task<TResponse?> GetByIdAsync(params object[] ids)
     {
-        var entity = await _repository.GetByIdAsync(id);
+        var entity = await _repository.GetByIdAsync(ids);
         return entity?.Adapt<TResponse>();
     }
 
@@ -44,6 +44,7 @@ public class GenericService<TRequest, TResponse, TEntity> : IGenericService<TReq
     {
         var entity = dto.Adapt<TEntity>();
         await _repository.AddAsync(entity);
+        await _unitOfWork.CompleteAsync();
         return entity.Adapt<TResponse>();
     }
 
@@ -51,45 +52,42 @@ public class GenericService<TRequest, TResponse, TEntity> : IGenericService<TReq
     {
         var entities = dtos.Adapt<IEnumerable<TEntity>>();
         await _repository.AddRangeAsync(entities);
+        await _unitOfWork.CompleteAsync();
         return entities.Adapt<IEnumerable<TResponse>>();
     }
 
-    public async Task UpdateAsync(object id, TRequest dto)
+    public async Task UpdateAsync(TRequest dto, params object[] ids)
     {
-        var targetEntity = await _repository.GetByIdAsync(id);
+        var targetEntity = await _repository.GetByIdAsync(ids);
         if (targetEntity != null)
         {
             dto.Adapt(targetEntity);
             _repository.Update(targetEntity);
+            await _unitOfWork.CompleteAsync();
         }
     }
 
-    public async Task RemoveAsync(object id)
+    public async Task RemoveAsync(params object[] ids)
     {
-        // Safe fetch before remove (prevents stub tracking errors)
-        var targetEntity = await _repository.GetByIdAsync(id);
+        var targetEntity = await _repository.GetByIdAsync(ids);
         if (targetEntity != null)
         {
             _repository.Remove(targetEntity);
+            await _unitOfWork.CompleteAsync();
         }
     }
 
-    public Task RemoveRangeAsync(IEnumerable<object> ids)
+    public async Task RemoveRangeAsync(IEnumerable<object[]> idsCollection)
     {
-        var stubs = new List<TEntity>();
-        var idProperty = typeof(TEntity).GetProperty("Id");
-
-        if (idProperty != null)
+        foreach (var ids in idsCollection)
         {
-            foreach (var id in ids)
+            var targetEntity = await _repository.GetByIdAsync(ids);
+            if (targetEntity != null)
             {
-                var stub = Activator.CreateInstance<TEntity>();
-                idProperty.SetValue(stub, id);
-                stubs.Add(stub);
+                _repository.Remove(targetEntity);
             }
-            _repository.RemoveRange(stubs);
         }
 
-        return Task.CompletedTask;
+        await _unitOfWork.CompleteAsync();
     }
 }
