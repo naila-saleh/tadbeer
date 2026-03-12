@@ -1,0 +1,15 @@
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\bin\Debug\net10.0\Tadbeer.DAL.deps.json
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\bin\Debug\net10.0\Tadbeer.DAL.runtimeconfig.json
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\bin\Debug\net10.0\Tadbeer.DAL.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\bin\Debug\net10.0\Tadbeer.DAL.pdb
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.csproj.AssemblyReference.cache
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.GeneratedMSBuildEditorConfig.editorconfig
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.AssemblyInfoInputs.cache
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.AssemblyInfo.cs
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.csproj.CoreCompileInputs.cache
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\refint\Tadbeer.DAL.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.pdb
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.genruntimeconfig.cache
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\ref\Tadbeer.DAL.dll
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.DAL\obj\Debug\net10.0\Tadbeer.DAL.sourcelink.json

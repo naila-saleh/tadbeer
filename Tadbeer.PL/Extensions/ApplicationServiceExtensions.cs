@@ -25,8 +25,11 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IBookingService, BookingService>();
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAIDetectionService, AIDetectionService>();
+<<<<<<< HEAD
         
         services.AddScoped<Tadbeer.BLL.Services.Interfaces.IAuthService, Tadbeer.BLL.Services.Classes.AuthService>();
+=======
+>>>>>>> 99b5d1ebd4ee0d50e68c8a2f60dc4511773e6dad
 
         return services;
     }

@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+<<<<<<< HEAD
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+=======
+>>>>>>> 99b5d1ebd4ee0d50e68c8a2f60dc4511773e6dad
 using Tadbeer.DAL.Data;
 using Tadbeer.DAL.Models;
 using Tadbeer.PL.Extensions;
@@ -19,6 +22,7 @@ builder.Services
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+<<<<<<< HEAD
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -40,6 +44,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+=======
+>>>>>>> 99b5d1ebd4ee0d50e68c8a2f60dc4511773e6dad
 builder.Services.AddAuthorization();
 
 // Add services to the container.
