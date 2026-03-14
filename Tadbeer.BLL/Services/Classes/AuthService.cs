@@ -151,4 +151,76 @@ public class AuthService : IAuthService
             Message = "Email confirmation failed."
         };
     }
+
+    public async Task<AuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto model)
+    {
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user == null)
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "User not found."
+            };
+        }
+        var random = new Random();
+        var code = random.Next(100000, 999999).ToString();
+        user.CodeResetPassword = code;
+        user.ExpirationCodeResetPassword = DateTime.UtcNow.AddMinutes(5);
+        await _userManager.UpdateAsync(user);
+        await _emailSender.SendEmailAsync(user.Email, "Reset your password", $"Your reset password code is: {code}");
+        return new AuthResponseDto
+        {
+            IsSuccess = true,
+            Message = "Reset password code sent to your email."
+        };
+    }
+
+    public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordRequestDto model)
+    {
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user == null)
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "User not found."
+            };
+        }
+
+        if (user.CodeResetPassword != model.Code)
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "Invalid code."
+            };
+        }
+
+        if (user.ExpirationCodeResetPassword < DateTime.UtcNow)
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "Invalid code."
+            };
+        }
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+        if (result.Succeeded)
+        {
+            await _emailSender.SendEmailAsync(model.Email, "Reset Password", $"<h1>Password Changed Successfully</h1>");
+            return new AuthResponseDto
+            {
+                IsSuccess = true,
+                Message = "Password changed successfully."
+            };
+        }
+
+        return new AuthResponseDto
+        {
+            IsSuccess = false,
+            Message = "Password reset failed."
+        };
+    }
 }

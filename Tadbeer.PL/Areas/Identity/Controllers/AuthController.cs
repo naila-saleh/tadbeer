@@ -67,4 +67,34 @@ public class AuthController : ControllerBase
         }
         return BadRequest(result);
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<string>> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var result = await _authService.ForgotPasswordAsync(model);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
+    }
+
+    [HttpPatch("reset-password")]
+    public async Task<ActionResult<string>> ResetPassword([FromBody] ResetPasswordRequestDto model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        var result = await _authService.ResetPasswordAsync(model);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+        return BadRequest(result);
+    }
 }

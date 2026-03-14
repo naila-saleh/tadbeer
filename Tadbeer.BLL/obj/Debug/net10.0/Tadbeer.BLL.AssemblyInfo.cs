@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Tadbeer.BLL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d798a90ceba12a6c3d4840eacd7d429b9a394bb2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2f9371c0ddfa2cb61e37d90bfbda97ac7eec41bd")]
 [assembly: System.Reflection.AssemblyProductAttribute("Tadbeer.BLL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Tadbeer.BLL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

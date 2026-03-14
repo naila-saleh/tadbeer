@@ -9,4 +9,6 @@ public interface IAuthService
     Task<AuthResponseDto> RegisterAsync(RegisterRequestDto model, HttpRequest request);
     Task<AuthResponseDto> LoginAsync(LoginRequestDto model);
     Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token);
+    Task<AuthResponseDto> ForgotPasswordAsync(ForgotPasswordRequestDto model);
+    Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordRequestDto model);
 }

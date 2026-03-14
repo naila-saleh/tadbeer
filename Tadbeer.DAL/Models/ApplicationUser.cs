@@ -17,6 +17,9 @@ public class ApplicationUser : IdentityUser<Guid>
     public string? JobDescription { get; set; }
     public long? ExperienceYears { get; set; }
     public long? AvgRating { get; set; }
+    
+    public string? CodeResetPassword { get; set; }
+    public DateTime? ExpirationCodeResetPassword { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
