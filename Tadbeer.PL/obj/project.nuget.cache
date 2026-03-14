@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ac7r+zPPKb0=",
+  "dgSpecHash": "kqxI6MokzXM=",
   "success": true,
   "projectFilePath": "D:\\Users\\hp\\RiderProjects\\Tadbeer\\Tadbeer.PL\\Tadbeer.PL.csproj",
   "expectedPackageFiles": [
@@ -62,6 +62,7 @@
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\10.0.3\\microsoft.aspnetcore.authentication.jwtbearer.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.authentication.openidconnect\\10.0.3\\microsoft.aspnetcore.authentication.openidconnect.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.identity.entityframeworkcore\\10.0.3\\microsoft.aspnetcore.identity.entityframeworkcore.10.0.3.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.identity.ui\\10.0.5\\microsoft.aspnetcore.identity.ui.10.0.5.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.3\\microsoft.aspnetcore.openapi.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.aspnetcore.razor.language\\6.0.24\\microsoft.aspnetcore.razor.language.6.0.24.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\8.0.0\\microsoft.bcl.asyncinterfaces.8.0.0.nupkg.sha512",
@@ -91,6 +92,7 @@
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\10.0.3\\microsoft.entityframeworkcore.sqlserver.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.entityframeworkcore.tools\\10.0.3\\microsoft.entityframeworkcore.tools.10.0.3.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.extensions.dependencymodel\\10.0.3\\microsoft.extensions.dependencymodel.10.0.3.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\microsoft.extensions.fileproviders.embedded\\10.0.5\\microsoft.extensions.fileproviders.embedded.10.0.5.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.identity.client\\4.73.1\\microsoft.identity.client.4.73.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.identity.client.extensions.msal\\4.73.1\\microsoft.identity.client.extensions.msal.4.73.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\microsoft.identitymodel.abstractions\\8.0.1\\microsoft.identitymodel.abstractions.8.0.1.nupkg.sha512",
@@ -121,6 +123,7 @@
     "C:\\Users\\hp\\.nuget\\packages\\nuget.projectmodel\\6.12.1\\nuget.projectmodel.6.12.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\nuget.protocol\\6.12.1\\nuget.protocol.6.12.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\nuget.versioning\\6.12.1\\nuget.versioning.6.12.1.nupkg.sha512",
+    "C:\\Users\\hp\\.nuget\\packages\\scalar.aspnetcore\\2.13.8\\scalar.aspnetcore.2.13.8.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\system.clientmodel\\1.5.1\\system.clientmodel.1.5.1.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\system.codedom\\6.0.0\\system.codedom.6.0.0.nupkg.sha512",
     "C:\\Users\\hp\\.nuget\\packages\\system.composition\\9.0.0\\system.composition.9.0.0.nupkg.sha512",

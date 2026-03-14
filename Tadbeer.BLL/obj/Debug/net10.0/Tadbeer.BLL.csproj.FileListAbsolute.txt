@@ -8,9 +8,9 @@ D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer.BLL.Gene
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer.BLL.AssemblyInfoInputs.cache
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer.BLL.AssemblyInfo.cs
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer.BLL.csproj.CoreCompileInputs.cache
+D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer.BLL.sourcelink.json
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer..B48E42BD.Up2Date
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer.BLL.dll
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\refint\Tadbeer.BLL.dll
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer.BLL.pdb
 D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\ref\Tadbeer.BLL.dll
-D:\Users\hp\RiderProjects\Tadbeer\Tadbeer.BLL\obj\Debug\net10.0\Tadbeer.BLL.sourcelink.json

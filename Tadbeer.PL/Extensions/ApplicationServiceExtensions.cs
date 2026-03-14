@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Tadbeer.BLL.Services.Classes.Specifics;
+using Tadbeer.BLL.Services.Interfaces;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
 using Tadbeer.DAL.Repositories.Classes;
 using Tadbeer.DAL.Repositories.Interfaces;
@@ -28,6 +29,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAIDetectionService, AIDetectionService>();
         services.AddScoped<IEmailSender, EmailSetting>();
+        services.AddScoped<IGenerateJWTService, GenerateJWTService>();
         
         services.AddScoped<BLL.Services.Interfaces.IAuthService, BLL.Services.Classes.AuthService>();
         

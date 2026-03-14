@@ -27,9 +27,4 @@
       <_ContentIncludedByDefault Remove="wwwroot\exampleJsInterop.js" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\Classes\" />
-      <Folder Include="Services\Interfaces\" />
-    </ItemGroup>
-
 </Project>
