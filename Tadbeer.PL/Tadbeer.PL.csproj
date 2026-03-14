@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.3">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.13.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Areas\Admin\" />
+      <Folder Include="Areas\Customer\" />
+      <Folder Include="Areas\Identity\" />
+      <Folder Include="Areas\Worker\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Tadbeer.BLL\Tadbeer.BLL.csproj" />
+      <ProjectReference Include="..\Tadbeer.DAL\Tadbeer.DAL.csproj" />
+    </ItemGroup>
+
+</Project>
