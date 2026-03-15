@@ -59,7 +59,7 @@ public class AuthController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        
+
         var result = await _authService.ConfirmEmailAsync(userId, token);
         if (result.IsSuccess)
         {

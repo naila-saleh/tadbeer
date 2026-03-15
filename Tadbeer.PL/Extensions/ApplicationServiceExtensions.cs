@@ -5,6 +5,7 @@ using Tadbeer.BLL.Services.Interfaces;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
 using Tadbeer.DAL.Repositories.Classes;
 using Tadbeer.DAL.Repositories.Interfaces;
+using Tadbeer.DAL.Utilities;
 using Tadbeer.PL.Utilities;
 
 namespace Tadbeer.PL.Extensions;
@@ -30,6 +31,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IAIDetectionService, AIDetectionService>();
         services.AddScoped<IEmailSender, EmailSetting>();
         services.AddScoped<IGenerateJWTService, GenerateJWTService>();
+        services.AddScoped<ISeedData, SeedData>();
         
         services.AddScoped<BLL.Services.Interfaces.IAuthService, BLL.Services.Classes.AuthService>();
         

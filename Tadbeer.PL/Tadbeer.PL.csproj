@@ -20,7 +20,7 @@
 
     <ItemGroup>
       <Folder Include="Areas\Admin\" />
-      <Folder Include="Areas\Customer\" />
+      <Folder Include="Areas\User\" />
       <Folder Include="Areas\Identity\" />
       <Folder Include="Areas\Worker\" />
     </ItemGroup>

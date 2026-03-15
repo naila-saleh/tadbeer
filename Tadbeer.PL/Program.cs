@@ -6,12 +6,18 @@ using System.Text;
 using Scalar.AspNetCore;
 using Tadbeer.DAL.Data;
 using Tadbeer.DAL.Models;
+using Tadbeer.DAL.Utilities;
 using Tadbeer.PL.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+// 1. Add DB Context first
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 2. Add Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
 {
     options.Password.RequiredLength = 8;
@@ -53,9 +59,6 @@ builder.Services.AddAuthorization();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // Register custom mappings (Mapster)
 Tadbeer.BLL.Profiles.MapsterConfig.RegisterMappings();
 
@@ -69,8 +72,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(userPolicy, policy =>
     {
         policy
-            //.WithOrigins("https://localhost:7139", "http://localhost:5129")
-            .AllowAnyOrigin()
+            .WithOrigins("https://localhost:7139", "http://localhost:5129")
             .AllowAnyHeader()
             .AllowAnyMethod();
         // If you use cookies/auth across origins, you'll also need:
@@ -84,6 +86,21 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var seedData = scope.ServiceProvider.GetRequiredService<ISeedData>();
+        await seedData.DataSeedingAsync();
+        await seedData.IdentityDataSeedingAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred during DB migration or seeding.");
+    }
 }
 
 app.UseHttpsRedirection();

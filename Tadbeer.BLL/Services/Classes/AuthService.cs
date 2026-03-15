@@ -102,7 +102,7 @@ public class AuthService : IAuthService
                 Message = "Email not confirmed."
             };
         }
-        
+
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
         if (!isPasswordValid)
         {
@@ -166,9 +166,13 @@ public class AuthService : IAuthService
         var random = new Random();
         var code = random.Next(100000, 999999).ToString();
         user.CodeResetPassword = code;
-        user.ExpirationCodeResetPassword = DateTime.UtcNow.AddMinutes(5);
+        user.ExpirationCodeResetPassword = DateTime.UtcNow.AddMinutes(15);
+
         await _userManager.UpdateAsync(user);
-        await _emailSender.SendEmailAsync(user.Email, "Reset your password", $"Your reset password code is: {code}");
+
+        await _emailSender.SendEmailAsync(user.Email!, "Reset your password",
+            $"Your password reset code is: <strong>{code}</strong>. It expires in 15 minutes.");
+
         return new AuthResponseDto
         {
             IsSuccess = true,
@@ -178,6 +182,15 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> ResetPasswordAsync(ResetPasswordRequestDto model)
     {
+        if (model.NewPassword != model.ConfirmNewPassword)
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "Passwords do not match."
+            };
+        }
+
         var user = await _userManager.FindByEmailAsync(model.Email);
         if (user == null)
         {
@@ -188,28 +201,27 @@ public class AuthService : IAuthService
             };
         }
 
-        if (user.CodeResetPassword != model.Code)
+        if (user.CodeResetPassword != model.Code || user.ExpirationCodeResetPassword < DateTime.UtcNow)
         {
             return new AuthResponseDto
             {
                 IsSuccess = false,
-                Message = "Invalid code."
+                Message = "Invalid or expired reset code."
             };
         }
 
-        if (user.ExpirationCodeResetPassword < DateTime.UtcNow)
-        {
-            return new AuthResponseDto
-            {
-                IsSuccess = false,
-                Message = "Invalid code."
-            };
-        }
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         var result = await _userManager.ResetPasswordAsync(user, token, model.NewPassword);
+
         if (result.Succeeded)
         {
-            await _emailSender.SendEmailAsync(model.Email, "Reset Password", $"<h1>Password Changed Successfully</h1>");
+            // Clear the reset code once used
+            user.CodeResetPassword = null;
+            user.ExpirationCodeResetPassword = null;
+            await _userManager.UpdateAsync(user);
+
+            await _emailSender.SendEmailAsync(model.Email, "Reset Password", "<h1>Password Changed Successfully</h1>");
+
             return new AuthResponseDto
             {
                 IsSuccess = true,
@@ -220,7 +232,8 @@ public class AuthService : IAuthService
         return new AuthResponseDto
         {
             IsSuccess = false,
-            Message = "Password reset failed."
+            Message = "Password reset failed.",
+            Errors = result.Errors.Select(e => e.Description)
         };
     }
 }
