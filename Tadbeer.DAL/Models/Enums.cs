@@ -1,7 +1,8 @@
-﻿namespace Tadbeer.DAL.Models;
+namespace Tadbeer.DAL.Models;
 
 public enum UserRole
 {
+    SuperAdmin,
     Admin,
     Worker,
     User

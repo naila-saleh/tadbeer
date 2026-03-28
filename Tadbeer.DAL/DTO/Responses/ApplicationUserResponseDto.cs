@@ -14,6 +14,7 @@ public class ApplicationUserResponseDto
 
     public string Role { get; set; } = null!;
     public string Status { get; set; } = null!;
+    public bool EmailConfirmed { get; set; }
 
     // Worker specific
     public string? JobDescription { get; set; }

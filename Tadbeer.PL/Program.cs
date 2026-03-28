@@ -11,7 +11,10 @@ using Tadbeer.PL.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<Tadbeer.PL.Filters.UserOperationExceptionFilter>();
+});
 
 // 1. Add DB Context first
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -54,6 +57,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+builder.Services.AddMemoryCache(); // Required for CheckUserStatusMiddleware
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -72,7 +76,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy(userPolicy, policy =>
     {
         policy
-            .WithOrigins("https://localhost:7139", "http://localhost:5129")
+            .SetIsOriginAllowed(origin =>
+            {
+                if(!Uri.TryCreate(origin, UriKind.Absolute, out var uri))return false;
+                if(uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) || uri.Host.Equals("127.0.0.1") || uri.Host.Equals("::1")) return true;
+                return uri.Host.Equals("https://tadbeer0.onrender.com", StringComparison.OrdinalIgnoreCase) || uri.Host.Equals("http://tadbeer0.onrender.com", StringComparison.OrdinalIgnoreCase);
+            })
             .AllowAnyHeader()
             .AllowAnyMethod();
         // If you use cookies/auth across origins, you'll also need:
@@ -82,16 +91,19 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.MapOpenApi();
     app.MapScalarApiReference();
-}
+//}
 
 using (var scope = app.Services.CreateScope())
 {
     try
     {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        await context.Database.MigrateAsync();
+
         var seedData = scope.ServiceProvider.GetRequiredService<ISeedData>();
         await seedData.DataSeedingAsync();
         await seedData.IdentityDataSeedingAsync();
@@ -109,9 +121,10 @@ app.UseAuthentication();
 // CORS (if needed) should generally run before auth
 app.UseCors(userPolicy);
 app.UseAuthorization();
+app.UseMiddleware<Tadbeer.PL.Middlewares.CheckUserStatusMiddleware>();
 
 app.UseStaticFiles();
 
 app.MapControllers();
-
+app.MapGet("/", () => "Hello World!");
 app.Run();

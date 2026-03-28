@@ -28,6 +28,7 @@ public class SeedData: ISeedData
     {
         if (!await _roleManager.Roles.AnyAsync())
         {
+            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = "SuperAdmin", NormalizedName = "SUPERADMIN" });
             await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = "Admin", NormalizedName = "ADMIN" });
             await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = "Worker", NormalizedName = "WORKER" });
             await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = "User", NormalizedName = "USER" });
@@ -43,9 +44,8 @@ public class SeedData: ISeedData
                 EmailConfirmed = true,
                 FirstName = "Naila",
                 LastName = "Saleh",
-                City = "Amman",
+                City = "Qalqilia",
                 ProfileImage = string.Empty,
-                Role = UserRole.Admin,
                 Status = UserStatus.Existed,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -57,9 +57,8 @@ public class SeedData: ISeedData
                 EmailConfirmed = true,
                 FirstName = "Lina",
                 LastName = "Odeh",
-                City = "Amman",
+                City = "Tulkarm",
                 ProfileImage = string.Empty,
-                Role = UserRole.Worker,
                 Status = UserStatus.Existed,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -71,9 +70,8 @@ public class SeedData: ISeedData
                 EmailConfirmed = true,
                 FirstName = "Rula",
                 LastName = "Duraidi",
-                City = "Amman",
+                City = "Tulkarm",
                 ProfileImage = string.Empty,
-                Role = UserRole.User,
                 Status = UserStatus.Existed,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -85,9 +83,8 @@ public class SeedData: ISeedData
                 EmailConfirmed = true,
                 FirstName = "Majd",
                 LastName = "Nassar",
-                City = "Amman",
+                City = "Nablus",
                 ProfileImage = string.Empty,
-                Role = UserRole.User,
                 Status = UserStatus.Existed,
                 CreatedAt = now,
                 UpdatedAt = now
@@ -103,9 +100,9 @@ public class SeedData: ISeedData
                 throw new InvalidOperationException("Failed to create one or more seeded users.");
             }
             
-            await _userManager.AddToRoleAsync(user1, "Admin");
-            await _userManager.AddToRoleAsync(user2, "Worker");
-            await _userManager.AddToRoleAsync(user3, "User");
+            await _userManager.AddToRoleAsync(user1, "SuperAdmin");
+            await _userManager.AddToRoleAsync(user2, "Admin");
+            await _userManager.AddToRoleAsync(user3, "Worker");
             await _userManager.AddToRoleAsync(user4, "User");
         }
         await _context.SaveChangesAsync();

@@ -45,25 +45,17 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.Property(x => x.City).HasMaxLength(255).IsRequired();
             e.Property(x => x.ProfileImage).HasMaxLength(255).IsRequired();
 
-            e.Property(x => x.Role)
-                .HasConversion<string>()
-                .HasMaxLength(255)
-                .HasDefaultValue(UserRole.User);
+
 
             e.Property(x => x.Status)
                 .HasConversion<string>()
                 .HasMaxLength(255)
                 .HasDefaultValue(UserStatus.Existed);
 
-            e.HasIndex(x => new { x.Role, x.Status });
-            e.HasIndex(x => new { x.City, x.Role });
+            e.HasIndex(x => x.Status);
             e.HasIndex(x => x.AvgRating);
             e.HasIndex(x => x.City);
 
-            e.HasCheckConstraint(
-                "CK_ApplicationUser_Role",
-                "[Role] IN ('Admin','Worker','User')"
-            );
 
             e.HasCheckConstraint(
                 "CK_ApplicationUser_Status",

@@ -17,7 +17,7 @@ public class ApplicationUserRequestDto
     // Optional password field (useful during creation)
     public string? Password { get; set; }
 
-    public UserRole Role { get; set; } = UserRole.User;
+    public string Role { get; set; } = "User";
     public UserStatus Status { get; set; } = UserStatus.Existed;
 
     // Worker specific

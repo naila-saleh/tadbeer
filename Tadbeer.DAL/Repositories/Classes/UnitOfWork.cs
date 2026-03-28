@@ -4,6 +4,8 @@ using Tadbeer.DAL.Data;
 using Tadbeer.DAL.Repositories.Classes.Specifics;
 using Tadbeer.DAL.Repositories.Interfaces;
 using Tadbeer.DAL.Repositories.Interfaces.Specifics;
+using Tadbeer.DAL.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Tadbeer.DAL.Repositories.Classes;
 
@@ -22,11 +24,11 @@ public class UnitOfWork : IUnitOfWork
     public IReviewRepository Reviews { get; private set; }
     public IAIDetectionRepository AIDetections { get; private set; }
 
-    public UnitOfWork(ApplicationDbContext context)
+    public UnitOfWork(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
 
-        ApplicationUsers = new ApplicationUserRepository(_context);
+        ApplicationUsers = new ApplicationUserRepository(_context, userManager);
         Specialties = new SpecialtyRepository(_context);
         WorkerSpecialties = new WorkerSpecialtyRepository(_context);
         PhoneNumbers = new PhoneNumberRepository(_context);

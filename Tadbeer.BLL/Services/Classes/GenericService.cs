@@ -67,7 +67,7 @@ public class GenericService<TRequest, TResponse, TEntity> : IGenericService<TReq
         }
     }
 
-    public async Task RemoveAsync(params object[] ids)
+    public virtual async Task RemoveAsync(params object[] ids)
     {
         var targetEntity = await _repository.GetByIdAsync(ids);
         if (targetEntity != null)

@@ -47,7 +47,6 @@ public class AuthService : IAuthService
             City = "", // Setting default, could be added to DTO if needed
             ProfileImage = "",
             Status = UserStatus.Existed,
-            Role = UserRole.User,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -61,6 +60,7 @@ public class AuthService : IAuthService
 
         if (result.Succeeded)
         {
+            await _userManager.AddToRoleAsync(user, "User");
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var escapeToken = Uri.EscapeDataString(token);
             var emailUrl = $"{request.Scheme}://{request.Host}/api/identity/auth/confirm-email?token={escapeToken}&userId={user.Id}";
@@ -100,6 +100,15 @@ public class AuthService : IAuthService
             {
                 IsSuccess = false,
                 Message = "Email not confirmed."
+            };
+        }
+
+        if (await _userManager.IsLockedOutAsync(user))
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "User account is blocked."
             };
         }
 

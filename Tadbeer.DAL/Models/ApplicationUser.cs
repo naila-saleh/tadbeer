@@ -10,7 +10,7 @@ public class ApplicationUser : IdentityUser<Guid>
 
     public string ProfileImage { get; set; } = null!;
 
-    public UserRole Role { get; set; } = UserRole.User;
+    //public UserRole Role { get; set; } = UserRole.User;
     public UserStatus Status { get; set; } = UserStatus.Existed;
 
     // for worker

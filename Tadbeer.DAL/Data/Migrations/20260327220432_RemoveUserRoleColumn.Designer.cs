@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tadbeer.DAL.Data;
 
@@ -11,9 +12,11 @@ using Tadbeer.DAL.Data;
 namespace Tadbeer.DAL.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260327220432_RemoveUserRoleColumn")]
+    partial class RemoveUserRoleColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -186,7 +189,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AIDetections", (string)null);
+                    b.ToTable("AIDetections");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.ApplicationUser", b =>
@@ -353,7 +356,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("WorkingHourId");
 
-                    b.ToTable("Bookings", null, t =>
+                    b.ToTable("Bookings", t =>
                         {
                             t.HasCheckConstraint("CK_Bookings_Status", "[Status] IN ('Pending','Accepted','Rejected','Completed','Cancelled')");
                         });
@@ -380,7 +383,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("WorkerId");
 
-                    b.ToTable("PhoneNumbers", (string)null);
+                    b.ToTable("PhoneNumbers");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.Review", b =>
@@ -409,7 +412,7 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.HasIndex("BookingId")
                         .IsUnique();
 
-                    b.ToTable("Reviews", null, t =>
+                    b.ToTable("Reviews", t =>
                         {
                             t.HasCheckConstraint("CK_Review_Rate", "[Rate] BETWEEN 1 AND 5");
                         });
@@ -428,7 +431,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specialties", (string)null);
+                    b.ToTable("Specialties");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkImage", b =>
@@ -455,7 +458,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("WorkerId");
 
-                    b.ToTable("WorkImages", (string)null);
+                    b.ToTable("WorkImages");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkSubImage", b =>
@@ -476,7 +479,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("MainImageId");
 
-                    b.ToTable("WorkSubImages", (string)null);
+                    b.ToTable("WorkSubImages");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkerSpecialty", b =>
@@ -491,7 +494,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("SpecialtyId");
 
-                    b.ToTable("WorkerSpecialties", (string)null);
+                    b.ToTable("WorkerSpecialties");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkingHours", b =>
@@ -518,7 +521,7 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasIndex("WorkerId");
 
-                    b.ToTable("WorkingHours", null, t =>
+                    b.ToTable("WorkingHours", t =>
                         {
                             t.HasCheckConstraint("CK_WorkingHours_DayOfWeek", "[DayOfWeek] IN ('Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday')");
                         });
