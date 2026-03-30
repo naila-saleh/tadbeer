@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 using Tadbeer.DAL.Data;
 using Tadbeer.DAL.Models;
 
@@ -18,10 +19,60 @@ public class SeedData: ISeedData
         _userManager = userManager;
     }
 
-    public Task DataSeedingAsync()
+    public async Task DataSeedingAsync()
     {
-        // Not yet implemented – add specialty/booking seed data here when needed.
-        return Task.CompletedTask;
+        var specialtyNames = new[]
+        {
+            "خدمات التنظيف",
+            "الأجهزة المنزلية",
+            "أعمال الكهرباء",
+            "دهانات وتشطيبات وديكور",
+            "أعمال السباكة",
+            "صيانة التكييف",
+            "أعمال الزراعة",
+            "فني ستالايت",
+            "أعمال الألمنيوم",
+            "أعمال النجارة",
+            "حرفي",
+            "خدمات خزانات المياه",
+            "كاميرات المراقبة",
+            "أعمال الحدادة"
+        };
+
+        var existingNames = await _context.Specialties
+            .Select(s => s.Name)
+            .ToListAsync();
+
+        var existingNormalized = existingNames
+            .Select(NormalizeName)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var newSpecialties = specialtyNames
+            .Where(name => !existingNormalized.Contains(NormalizeName(name)))
+            .Select(name => new Specialty
+            {
+                Id = Guid.NewGuid(),
+                Name = name.Trim()
+            })
+            .ToList();
+
+        if (newSpecialties.Count == 0)
+        {
+            return;
+        }
+
+        await _context.Specialties.AddRangeAsync(newSpecialties);
+        await _context.SaveChangesAsync();
+    }
+
+    private static string NormalizeName(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        value = value.Trim();
+        value = Regex.Replace(value, @"\s+", " ");
+        return value.ToUpperInvariant();
     }
 
     public async Task IdentityDataSeedingAsync()
