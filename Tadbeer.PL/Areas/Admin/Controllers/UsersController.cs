@@ -1,4 +1,3 @@
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +6,7 @@ using Tadbeer.DAL.DTO.Requests;
 using Tadbeer.DAL.DTO.Responses;
 using Tadbeer.DAL.Models;
 
-namespace Tadbeer.PL.Controllers;
+namespace Tadbeer.PL.Areas.Admin.Controllers;
 
 [Route("api/[area]/[controller]")]
 [ApiController]
@@ -16,23 +15,20 @@ namespace Tadbeer.PL.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IApplicationUserService _userService;
-    private readonly UserManager<ApplicationUser> _userManager;
 
     public UsersController(
-        IApplicationUserService userService,
-        UserManager<ApplicationUser> userManager)
+        IApplicationUserService userService)
     {
         _userService = userService;
-        _userManager = userManager;
     }
-
+    
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ApplicationUserResponseDto>>> GetAll()
     {
         var users = await _userService.GetAllAsync();
         return Ok(users);
     }
-
+    
     [HttpGet("{id}")]
     public async Task<ActionResult<ApplicationUserResponseDto>> GetById(Guid id)
     {

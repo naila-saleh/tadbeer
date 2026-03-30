@@ -7,7 +7,7 @@ namespace Tadbeer.PL.Areas.User.Controllers;
 
 [Route("api/[area]/[controller]")]
 [ApiController]
-[Area("User")]
+[Area("General")]
 [AllowAnonymous]
 public class SpecialtiesController : ControllerBase
 {
