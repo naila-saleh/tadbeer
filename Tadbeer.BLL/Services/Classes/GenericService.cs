@@ -40,7 +40,7 @@ public class GenericService<TRequest, TResponse, TEntity> : IGenericService<TReq
         return entities.Adapt<IEnumerable<TResponse>>();
     }
 
-    public async Task<TResponse> AddAsync(TRequest dto)
+    public virtual async Task<TResponse> AddAsync(TRequest dto)
     {
         var entity = dto.Adapt<TEntity>();
         await _repository.AddAsync(entity);
@@ -56,7 +56,7 @@ public class GenericService<TRequest, TResponse, TEntity> : IGenericService<TReq
         return entities.Adapt<IEnumerable<TResponse>>();
     }
 
-    public async Task UpdateAsync(TRequest dto, params object[] ids)
+    public virtual async Task UpdateAsync(TRequest dto, params object[] ids)
     {
         var targetEntity = await _repository.GetByIdAsync(ids);
         if (targetEntity != null)

@@ -13,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<Tadbeer.PL.Filters.UserOperationExceptionFilter>();
+    options.Filters.Add<Tadbeer.PL.Filters.GlobalExceptionFilter>();
 });
 
 // 1. Add DB Context first

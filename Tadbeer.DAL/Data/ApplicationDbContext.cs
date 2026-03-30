@@ -67,6 +67,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         {
             e.Property(x => x.Name).HasMaxLength(255).IsRequired();
         });
+        builder.Entity<Specialty>().HasIndex(x => x.Name).IsUnique();
 
         builder.Entity<WorkerSpecialty>(e =>
         {
