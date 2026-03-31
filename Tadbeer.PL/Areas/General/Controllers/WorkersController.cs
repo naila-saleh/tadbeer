@@ -1,10 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
 using Tadbeer.DAL.DTO.Responses;
-using Tadbeer.DAL.Models;
 
 namespace Tadbeer.PL.Areas.General.Controllers;
 
@@ -39,5 +36,17 @@ public class WorkersController : ControllerBase
         }
 
         return Ok(user);
+    }
+
+    [HttpGet("{id:guid}/profile")]
+    public async Task<ActionResult<WorkerPublicProfileResponseDto>> GetWorkerPublicProfile(Guid id)
+    {
+        var profile = await _userService.GetWorkerPublicProfileAsync(id);
+        if (profile == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(profile);
     }
 }

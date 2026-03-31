@@ -22,9 +22,7 @@
       <Folder Include="Areas\Admin\" />
       <Folder Include="Areas\Identity\" />
       <Folder Include="Areas\User\" />
-      <Folder Include="Areas\User\Controllers\" />
       <Folder Include="Areas\Worker\" />
-      <Folder Include="Areas\Worker\Controllers\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -3,6 +3,7 @@ using Tadbeer.DAL.Models;
 using Tadbeer.DAL.Repositories.Interfaces.Specifics;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tadbeer.DAL.Repositories.Classes.Specifics;
 
@@ -13,6 +14,16 @@ public class ApplicationUserRepository : GenericRepository<ApplicationUser>, IAp
     public ApplicationUserRepository(ApplicationDbContext context, UserManager<ApplicationUser> userManager) : base(context)
     {
         _userManager = userManager;
+    }
+
+    public async Task<ApplicationUser?> GetByIdWithWorkImagesAsync(Guid userId)
+    {
+        return await _context.Users
+            .Include(u => u.WorkImages)
+            .ThenInclude(wi => wi.SubImages)
+            .Include(u => u.WorkerSpecialties)
+            .ThenInclude(ws => ws.Specialty)
+            .FirstOrDefaultAsync(u => u.Id == userId);
     }
 
     public async Task<bool> BlockUserAsync(Guid id, int minutes)

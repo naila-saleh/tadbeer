@@ -20,6 +20,7 @@ public class ApplicationUserResponseDto
     public string? JobDescription { get; set; }
     public long? ExperienceYears { get; set; }
     public long? AvgRating { get; set; }
+    public ICollection<string>? SpecialtyNames { get; set; } = new List<string>();
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

@@ -1,0 +1,64 @@
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Tadbeer.BLL.Services.Interfaces.Specifics;
+using Tadbeer.DAL.DTO.Requests.Profile;
+using Tadbeer.DAL.DTO.Responses.Profile;
+
+namespace Tadbeer.PL.Areas.Admin.Controllers;
+
+[Route("api/[area]/[controller]")]
+[ApiController]
+[Area("Admin")]
+[Authorize(Roles = "Admin")]
+public class ProfileController : ControllerBase
+{
+    private readonly IApplicationUserService _userService;
+
+    public ProfileController(IApplicationUserService userService)
+    {
+        _userService = userService;
+    }
+
+    [HttpGet("me")]
+    public async Task<ActionResult<AdminProfileResponseDto>> GetMyProfile()
+    {
+        if (!TryGetCurrentUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var profile = await _userService.GetAdminProfileAsync(userId);
+        if (profile == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(profile);
+    }
+
+    [HttpPut("me")]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<AdminProfileResponseDto>> UpdateMyProfile([FromForm] AdminProfileUpdateRequestDto request)
+    {
+        if (!TryGetCurrentUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var profile = await _userService.UpdateAdminProfileAsync(userId, request);
+        if (profile == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(profile);
+    }
+
+    private bool TryGetCurrentUserId(out Guid userId)
+    {
+        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(userIdValue, out userId);
+    }
+}
+
