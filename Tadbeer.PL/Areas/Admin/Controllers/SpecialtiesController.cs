@@ -21,7 +21,8 @@ public class SpecialtiesController : ControllerBase
 
     // POST api/admin/specialties
     [HttpPost]
-    public async Task<ActionResult<SpecialtyResponseDto>> Create([FromBody] SpecialtyRequestDto dto)
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<SpecialtyResponseDto>> Create([FromForm] SpecialtyRequestDto dto)
     {
         var created = await _specialtyService.AddAsync(dto);
         return CreatedAtAction(nameof(Create), new { id = created.Id }, created);
@@ -29,7 +30,8 @@ public class SpecialtiesController : ControllerBase
 
     // PUT api/admin/specialties/{id}
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] SpecialtyRequestDto dto)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Update(Guid id, [FromForm] SpecialtyRequestDto dto)
     {
         var existing = await _specialtyService.GetByIdAsync(id);
         if (existing is null) return NotFound();

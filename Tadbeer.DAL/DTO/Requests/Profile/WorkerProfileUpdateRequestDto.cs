@@ -6,4 +6,5 @@ public class WorkerProfileUpdateRequestDto : BaseProfileUpdateRequestDto
     public long? ExperienceYears { get; set; }
     // Comma-separated specialty names from UI select (e.g. "Plumbing,Electrical")
     public string? SpecialtyNamesCsv { get; set; }
+    public ICollection<WorkingHoursRequestDto>? WorkingHours { get; set; }
 }

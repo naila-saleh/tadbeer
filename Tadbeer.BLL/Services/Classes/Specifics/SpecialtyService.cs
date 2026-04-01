@@ -1,6 +1,7 @@
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Tadbeer.BLL.Exceptions;
+using Tadbeer.BLL.Services.Interfaces;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
 using Tadbeer.BLL.Utilities;
 using Tadbeer.DAL.DTO.Requests;
@@ -13,9 +14,15 @@ namespace Tadbeer.BLL.Services.Classes.Specifics;
 public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyResponseDto, Specialty>, ISpecialtyService
 {
     private const string DuplicateSpecialtyMessage = "Specialty already exists.";
+    private static readonly string[] AllowedIconExtensions = [".jpg", ".jpeg", ".png", ".svg"];
+    private const long MaxIconSizeBytes = 2 * 1024 * 1024; // 2 MB
 
-    public SpecialtyService(IUnitOfWork unitOfWork) : base(unitOfWork, unitOfWork.Specialties)
+    private readonly IFileStorageService _fileStorageService;
+
+    public SpecialtyService(IUnitOfWork unitOfWork, IFileStorageService fileStorageService)
+        : base(unitOfWork, unitOfWork.Specialties)
     {
+        _fileStorageService = fileStorageService;
     }
 
     public override async Task<SpecialtyResponseDto> AddAsync(SpecialtyRequestDto dto)
@@ -34,14 +41,36 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
 
         dto.Name = dto.Name.Trim();
 
+        // Build the entity manually so we can handle icon upload before saving.
+        var entity = new Specialty
+        {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            Description = dto.Description?.Trim()
+        };
+
+        if (dto.Icon != null)
+        {
+            if (!_fileStorageService.ValidateFile(dto.Icon, AllowedIconExtensions, MaxIconSizeBytes))
+            {
+                throw new UserOperationException(
+                    "Invalid icon file. Allowed: jpg, jpeg, png, svg. Max size: 2 MB.");
+            }
+
+            entity.Icon = await _fileStorageService.SaveFileAsync(dto.Icon, "specialty-icons", Guid.Empty);
+        }
+
         try
         {
-            return await base.AddAsync(dto);
+            await _repository.AddAsync(entity);
+            await _unitOfWork.CompleteAsync();
         }
         catch (DbUpdateException)
         {
             throw new DuplicateSpecialtyException(DuplicateSpecialtyMessage);
         }
+
+        return MapToResponse(entity);
     }
 
     public override async Task UpdateAsync(SpecialtyRequestDto dto, params object[] ids)
@@ -64,8 +93,30 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
             throw new DuplicateSpecialtyException(DuplicateSpecialtyMessage);
         }
 
-        dto.Name = dto.Name.Trim();
-        dto.Adapt(target);
+        target.Name = dto.Name.Trim();
+
+        if (dto.Description != null)
+        {
+            target.Description = dto.Description.Trim();
+        }
+
+        if (dto.Icon != null)
+        {
+            if (!_fileStorageService.ValidateFile(dto.Icon, AllowedIconExtensions, MaxIconSizeBytes))
+            {
+                throw new UserOperationException(
+                    "Invalid icon file. Allowed: jpg, jpeg, png, svg. Max size: 2 MB.");
+            }
+
+            // Delete old icon if present.
+            if (!string.IsNullOrEmpty(target.Icon))
+            {
+                await _fileStorageService.DeleteFileAsync(target.Icon);
+            }
+
+            target.Icon = await _fileStorageService.SaveFileAsync(dto.Icon, "specialty-icons", Guid.Empty);
+        }
+
         _repository.Update(target);
 
         try
@@ -77,4 +128,12 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
             throw new DuplicateSpecialtyException(DuplicateSpecialtyMessage);
         }
     }
+
+    private static SpecialtyResponseDto MapToResponse(Specialty s) => new()
+    {
+        Id = s.Id,
+        Name = s.Name,
+        Description = s.Description,
+        IconUrl = s.Icon
+    };
 }

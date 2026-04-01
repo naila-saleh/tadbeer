@@ -23,6 +23,7 @@ public class ApplicationUserRepository : GenericRepository<ApplicationUser>, IAp
             .ThenInclude(wi => wi.SubImages)
             .Include(u => u.WorkerSpecialties)
             .ThenInclude(ws => ws.Specialty)
+            .Include(u => u.WorkingHours)
             .FirstOrDefaultAsync(u => u.Id == userId);
     }
 

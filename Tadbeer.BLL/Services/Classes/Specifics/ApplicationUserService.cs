@@ -39,10 +39,19 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             if (string.Equals(role, "Worker", StringComparison.OrdinalIgnoreCase))
             {
                 var workerWithRelations = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(user.Id);
-                dto.SpecialtyNames = workerWithRelations?.WorkerSpecialties
+                var specialties = workerWithRelations?.WorkerSpecialties.ToList() ?? new List<WorkerSpecialty>();
+                dto.SpecialtyIds = specialties.Select(ws => ws.SpecialtyId).Distinct().ToList();
+                dto.SpecialtyNames = specialties
                     .Select(ws => ws.Specialty.Name)
                     .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList() ?? new List<string>();
+                    .ToList();
+                dto.WorkingHours = workerWithRelations?.WorkingHours.Select(wh => new WorkingHoursResponseDto
+                {
+                    Id = wh.Id,
+                    DayOfWeek = wh.DayOfWeek,
+                    StartTime = wh.StartTime,
+                    EndTime = wh.EndTime
+                }).ToList() ?? new List<WorkingHoursResponseDto>();
             }
         }
         return dtos;
@@ -61,10 +70,19 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         if (string.Equals(role, "Worker", StringComparison.OrdinalIgnoreCase))
         {
             var workerWithRelations = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(user.Id);
-            dto.SpecialtyNames = workerWithRelations?.WorkerSpecialties
+            var specialties = workerWithRelations?.WorkerSpecialties.ToList() ?? new List<WorkerSpecialty>();
+            dto.SpecialtyIds = specialties.Select(ws => ws.SpecialtyId).Distinct().ToList();
+            dto.SpecialtyNames = specialties
                 .Select(ws => ws.Specialty.Name)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList() ?? new List<string>();
+                .ToList();
+            dto.WorkingHours = workerWithRelations?.WorkingHours.Select(wh => new WorkingHoursResponseDto
+            {
+                Id = wh.Id,
+                DayOfWeek = wh.DayOfWeek,
+                StartTime = wh.StartTime,
+                EndTime = wh.EndTime
+            }).ToList() ?? new List<WorkingHoursResponseDto>();
         }
 
         return dto;
@@ -196,7 +214,28 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
         user.UpdatedAt = DateTime.UtcNow;
         
-        if (!string.IsNullOrWhiteSpace(request.SpecialtyNamesCsv))
+        if (request.SpecialtyId.HasValue)
+        {
+            var specialty = await _unitOfWork.Specialties.GetByIdAsync(request.SpecialtyId.Value);
+            if (specialty == null)
+            {
+                throw new UserOperationException($"Specialty with ID {request.SpecialtyId.Value} not found.");
+            }
+
+            var existingSpecialties = user.WorkerSpecialties.ToList();
+            if (existingSpecialties.Count > 0)
+            {
+                _unitOfWork.WorkerSpecialties.RemoveRange(existingSpecialties);
+            }
+
+            var workerSpecialty = new WorkerSpecialty
+            {
+                WorkerId = user.Id,
+                SpecialtyId = specialty.Id
+            };
+            await _unitOfWork.WorkerSpecialties.AddAsync(workerSpecialty);
+        }
+        else if (!string.IsNullOrWhiteSpace(request.SpecialtyNamesCsv))
         {
             var requestedNames = request.SpecialtyNamesCsv
                 .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -225,6 +264,28 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
                     SpecialtyId = specialty.Id
                 };
                 await _unitOfWork.WorkerSpecialties.AddAsync(workerSpecialty);
+            }
+        }
+
+        if (request.WorkingHours != null)
+        {
+            var existingHours = user.WorkingHours.ToList();
+            if (existingHours.Count > 0)
+            {
+                _unitOfWork.WorkingHours.RemoveRange(existingHours);
+            }
+
+            foreach (var whDto in request.WorkingHours)
+            {
+                var workingHours = new WorkingHours
+                {
+                    Id = Guid.NewGuid(),
+                    WorkerId = user.Id,
+                    DayOfWeek = whDto.DayOfWeek,
+                    StartTime = whDto.StartTime,
+                    EndTime = whDto.EndTime
+                };
+                await _unitOfWork.WorkingHours.AddAsync(workingHours);
             }
         }
 
@@ -589,10 +650,21 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             JobDescription = user.JobDescription,
             ExperienceYears = user.ExperienceYears,
             AvgRating = user.AvgRating,
+            SpecialtyIds = user.WorkerSpecialties
+                .Select(ws => ws.SpecialtyId)
+                .Distinct()
+                .ToList(),
             SpecialtyNames = user.WorkerSpecialties
                 .Select(ws => ws.Specialty.Name)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList(),
+            WorkingHours = user.WorkingHours.Select(wh => new WorkingHoursResponseDto
+            {
+                Id = wh.Id,
+                DayOfWeek = wh.DayOfWeek,
+                StartTime = wh.StartTime,
+                EndTime = wh.EndTime
+            }).ToList(),
             WorkImages = user.WorkImages.Select(main => new WorkerWorkImageResponseDto
             {
                 Id = main.Id,
@@ -621,10 +693,21 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             JobDescription = user.JobDescription,
             ExperienceYears = user.ExperienceYears,
             AvgRating = user.AvgRating,
+            SpecialtyIds = user.WorkerSpecialties
+                .Select(ws => ws.SpecialtyId)
+                .Distinct()
+                .ToList(),
             SpecialtyNames = user.WorkerSpecialties
                 .Select(ws => ws.Specialty.Name)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList(),
+            WorkingHours = user.WorkingHours.Select(wh => new WorkingHoursResponseDto
+            {
+                Id = wh.Id,
+                DayOfWeek = wh.DayOfWeek,
+                StartTime = wh.StartTime,
+                EndTime = wh.EndTime
+            }).ToList(),
             WorkImages = user.WorkImages.Select(main => new WorkerPublicWorkImageResponseDto
             {
                 ImageUrl = main.ImageUrl,
