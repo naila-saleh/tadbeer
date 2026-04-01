@@ -9,7 +9,9 @@ public class SpecialtyRequestDto
     [StringLength(100, MinimumLength = 2)]
     public string Name { get; set; } = null!;
 
-    public string? Description { get; set; }
+    [Required]
+    [StringLength(1000, MinimumLength = 2)]
+    public string Description { get; set; } = null!;
 
     /// <summary>Icon image file (jpg, jpeg, png, svg). Optional on update.</summary>
     public IFormFile? Icon { get; set; }

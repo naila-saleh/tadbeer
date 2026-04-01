@@ -21,22 +21,22 @@ public class SeedData: ISeedData
 
     public async Task DataSeedingAsync()
     {
-        var specialtyNames = new[]
+        var specialtiesSeed = new[]
         {
-            "خدمات التنظيف",
-            "الأجهزة المنزلية",
-            "أعمال الكهرباء",
-            "دهانات وتشطيبات وديكور",
-            "أعمال السباكة",
-            "صيانة التكييف",
-            "أعمال الزراعة",
-            "فني ستالايت",
-            "أعمال الألمنيوم",
-            "أعمال النجارة",
-            "حرفي",
-            "خدمات خزانات المياه",
-            "كاميرات المراقبة",
-            "أعمال الحدادة"
+            new { Name = "خدمات التنظيف", Description = "خدمات تنظيف المنازل والمكاتب والمنشآت", Icon = "specialty-icons/default.png" },
+            new { Name = "الأجهزة المنزلية", Description = "صيانة وإصلاح الأجهزة المنزلية", Icon = "specialty-icons/default.png" },
+            new { Name = "أعمال الكهرباء", Description = "تركيب وصيانة الأعطال الكهربائية", Icon = "specialty-icons/default.png" },
+            new { Name = "دهانات وتشطيبات وديكور", Description = "أعمال دهان وتشطيب وديكور داخلي", Icon = "specialty-icons/default.png" },
+            new { Name = "أعمال السباكة", Description = "إصلاح وتركيب تمديدات السباكة", Icon = "specialty-icons/default.png" },
+            new { Name = "صيانة التكييف", Description = "صيانة وتنظيف وتركيب أجهزة التكييف", Icon = "specialty-icons/default.png" },
+            new { Name = "أعمال الزراعة", Description = "خدمات الزراعة وتنسيق الحدائق", Icon = "specialty-icons/default.png" },
+            new { Name = "فني ستالايت", Description = "تركيب وضبط وصيانة أجهزة الستالايت", Icon = "specialty-icons/default.png" },
+            new { Name = "أعمال الألمنيوم", Description = "تصنيع وتركيب وصيانة الألمنيوم", Icon = "specialty-icons/default.png" },
+            new { Name = "أعمال النجارة", Description = "تصنيع وصيانة الأعمال الخشبية", Icon = "specialty-icons/default.png" },
+            new { Name = "حرفي", Description = "خدمات حرفية متنوعة", Icon = "specialty-icons/default.png" },
+            new { Name = "خدمات خزانات المياه", Description = "تنظيف وصيانة خزانات المياه", Icon = "specialty-icons/default.png" },
+            new { Name = "كاميرات المراقبة", Description = "تركيب وصيانة أنظمة المراقبة", Icon = "specialty-icons/default.png" },
+            new { Name = "أعمال الحدادة", Description = "تصنيع وصيانة أعمال الحدادة", Icon = "specialty-icons/default.png" }
         };
 
         var existingNames = await _context.Specialties
@@ -47,12 +47,14 @@ public class SeedData: ISeedData
             .Select(NormalizeName)
             .ToHashSet(StringComparer.Ordinal);
 
-        var newSpecialties = specialtyNames
-            .Where(name => !existingNormalized.Contains(NormalizeName(name)))
-            .Select(name => new Specialty
+        var newSpecialties = specialtiesSeed
+            .Where(s => !existingNormalized.Contains(NormalizeName(s.Name)))
+            .Select(s => new Specialty
             {
                 Id = Guid.NewGuid(),
-                Name = name.Trim()
+                Name = s.Name.Trim(),
+                Description = s.Description.Trim(),
+                Icon = s.Icon.Trim()
             })
             .ToList();
 

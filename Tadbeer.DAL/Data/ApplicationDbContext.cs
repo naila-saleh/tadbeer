@@ -66,6 +66,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<Specialty>(e =>
         {
             e.Property(x => x.Name).HasMaxLength(255).IsRequired();
+            e.Property(x => x.Description).HasMaxLength(1000).IsRequired();
+            e.Property(x => x.Icon).HasMaxLength(255).IsRequired();
+
+            e.HasCheckConstraint(
+                "CK_Specialty_Description_NotEmpty",
+                "LEN(LTRIM(RTRIM([Description]))) > 0"
+            );
+
+            e.HasCheckConstraint(
+                "CK_Specialty_Icon_NotEmpty",
+                "LEN(LTRIM(RTRIM([Icon]))) > 0"
+            );
         });
         builder.Entity<Specialty>().HasIndex(x => x.Name).IsUnique();
 

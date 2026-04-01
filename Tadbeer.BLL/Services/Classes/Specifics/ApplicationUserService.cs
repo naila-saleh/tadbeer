@@ -214,41 +214,21 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
         user.UpdatedAt = DateTime.UtcNow;
         
-        if (request.SpecialtyId.HasValue)
+        var hasSpecialtyIds = request.SpecialtyIds != null && request.SpecialtyIds.Count > 0;
+
+        if (hasSpecialtyIds)
         {
-            var specialty = await _unitOfWork.Specialties.GetByIdAsync(request.SpecialtyId.Value);
-            if (specialty == null)
-            {
-                throw new UserOperationException($"Specialty with ID {request.SpecialtyId.Value} not found.");
-            }
-
-            var existingSpecialties = user.WorkerSpecialties.ToList();
-            if (existingSpecialties.Count > 0)
-            {
-                _unitOfWork.WorkerSpecialties.RemoveRange(existingSpecialties);
-            }
-
-            var workerSpecialty = new WorkerSpecialty
-            {
-                WorkerId = user.Id,
-                SpecialtyId = specialty.Id
-            };
-            await _unitOfWork.WorkerSpecialties.AddAsync(workerSpecialty);
-        }
-        else if (!string.IsNullOrWhiteSpace(request.SpecialtyNamesCsv))
-        {
-            var requestedNames = request.SpecialtyNamesCsv
-                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            var specialties = await _unitOfWork.Specialties.FindAsync(s => requestedNames.Contains(s.Name));
+            var distinctIds = request.SpecialtyIds!.Distinct().ToList();
+            var specialties = await _unitOfWork.Specialties.FindAsync(s => distinctIds.Contains(s.Id));
             var specialtyList = specialties.ToList();
 
-            if (requestedNames.Count > 0 && specialtyList.Count == 0)
+            var foundIds = specialtyList.Select(s => s.Id).ToHashSet();
+            var missingIds = distinctIds.Where(id => !foundIds.Contains(id)).ToList();
+            if (missingIds.Count > 0)
             {
-                throw new UserOperationException("None of the provided specialty names were found.");
+                throw new UserOperationException($"Specialty IDs not found: {string.Join(", ", missingIds)}");
             }
+
 
             var existingSpecialties = user.WorkerSpecialties.ToList();
             if (existingSpecialties.Count > 0)

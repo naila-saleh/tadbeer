@@ -1,4 +1,3 @@
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Tadbeer.BLL.Exceptions;
 using Tadbeer.BLL.Services.Interfaces;
@@ -27,6 +26,16 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
 
     public override async Task<SpecialtyResponseDto> AddAsync(SpecialtyRequestDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Description))
+        {
+            throw new UserOperationException("Specialty description is required.");
+        }
+
+        if (dto.Icon == null)
+        {
+            throw new UserOperationException("Specialty icon is required.");
+        }
+
         var normalizedName = StringNormalization.NormalizeName(dto.Name);
 
         // Normalize in memory because custom normalization logic cannot be translated to SQL.
@@ -46,19 +55,16 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
         {
             Id = Guid.NewGuid(),
             Name = dto.Name,
-            Description = dto.Description?.Trim()
+            Description = dto.Description.Trim()
         };
 
-        if (dto.Icon != null)
+        if (!_fileStorageService.ValidateFile(dto.Icon, AllowedIconExtensions, MaxIconSizeBytes))
         {
-            if (!_fileStorageService.ValidateFile(dto.Icon, AllowedIconExtensions, MaxIconSizeBytes))
-            {
-                throw new UserOperationException(
-                    "Invalid icon file. Allowed: jpg, jpeg, png, svg. Max size: 2 MB.");
-            }
-
-            entity.Icon = await _fileStorageService.SaveFileAsync(dto.Icon, "specialty-icons", Guid.Empty);
+            throw new UserOperationException(
+                "Invalid icon file. Allowed: jpg, jpeg, png, svg. Max size: 2 MB.");
         }
+
+        entity.Icon = await _fileStorageService.SaveFileAsync(dto.Icon, "specialty-icons", Guid.Empty);
 
         try
         {
@@ -75,6 +81,11 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
 
     public override async Task UpdateAsync(SpecialtyRequestDto dto, params object[] ids)
     {
+        if (string.IsNullOrWhiteSpace(dto.Description))
+        {
+            throw new UserOperationException("Specialty description is required.");
+        }
+
         var target = await _repository.GetByIdAsync(ids);
         if (target is null)
         {
@@ -95,10 +106,7 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
 
         target.Name = dto.Name.Trim();
 
-        if (dto.Description != null)
-        {
-            target.Description = dto.Description.Trim();
-        }
+        target.Description = dto.Description.Trim();
 
         if (dto.Icon != null)
         {
@@ -127,6 +135,23 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
         {
             throw new DuplicateSpecialtyException(DuplicateSpecialtyMessage);
         }
+    }
+
+    public override async Task RemoveAsync(params object[] ids)
+    {
+        var target = await _repository.GetByIdAsync(ids);
+        if (target is null)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.Icon))
+        {
+            await _fileStorageService.DeleteFileAsync(target.Icon);
+        }
+
+        _repository.Remove(target);
+        await _unitOfWork.CompleteAsync();
     }
 
     private static SpecialtyResponseDto MapToResponse(Specialty s) => new()

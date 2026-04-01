@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tadbeer.DAL.Data;
 
@@ -11,9 +12,11 @@ using Tadbeer.DAL.Data;
 namespace Tadbeer.DAL.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260401200740_AddSpecialtyDescriptionAndIcon")]
+    partial class AddSpecialtyDescriptionAndIcon
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -423,13 +426,11 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Icon")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -441,12 +442,7 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Specialties", t =>
-                        {
-                            t.HasCheckConstraint("CK_Specialty_Description_NotEmpty", "LEN(LTRIM(RTRIM([Description]))) > 0");
-
-                            t.HasCheckConstraint("CK_Specialty_Icon_NotEmpty", "LEN(LTRIM(RTRIM([Icon]))) > 0");
-                        });
+                    b.ToTable("Specialties");
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkImage", b =>
