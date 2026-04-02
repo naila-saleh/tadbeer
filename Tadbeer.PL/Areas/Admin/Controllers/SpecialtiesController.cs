@@ -28,8 +28,8 @@ public class SpecialtiesController : ControllerBase
         return CreatedAtAction(nameof(Create), new { id = created.Id }, created);
     }
 
-    // PUT api/admin/specialties/{id}
-    [HttpPut("{id:guid}")]
+    // PATCH api/admin/specialties/{id}
+    [HttpPatch("{id:guid}")]
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Update(Guid id, [FromForm] SpecialtyRequestDto dto)
     {

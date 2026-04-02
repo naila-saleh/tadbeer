@@ -19,29 +19,68 @@ public class SeedData: ISeedData
         _userManager = userManager;
     }
 
-    public async Task DataSeedingAsync()
+    public async Task SpecialtiesDataSeedingAsync()
     {
+        // Ensure specialty-icons directory exists in wwwroot
+        // Use a more reliable path - get the executing assembly location
+        var currentDir = AppContext.BaseDirectory;
+        var wwwrootPath = Path.Combine(currentDir, "wwwroot");
+        var iconsDirPath = Path.Combine(wwwrootPath, "specialty-icons");
+        
+        // If not found in standard location, try alternative path
+        if (!Directory.Exists(wwwrootPath))
+        {
+            wwwrootPath = Path.Combine(currentDir, "..", "..", "wwwroot");
+            iconsDirPath = Path.Combine(wwwrootPath, "specialty-icons");
+        }
+
+        // Normalize the path
+        wwwrootPath = Path.GetFullPath(wwwrootPath);
+        iconsDirPath = Path.GetFullPath(iconsDirPath);
+        
+        Directory.CreateDirectory(iconsDirPath);
+
+        // Create a default placeholder PNG icon if it doesn't exist
+        var defaultIconPath = Path.Combine(iconsDirPath, "default.png");
+        if (!File.Exists(defaultIconPath))
+        {
+            CreateDefaultIconFile(defaultIconPath);
+        }
+
+        const string defaultIconUrl = "specialty-icons/default.png";
+        
         var specialtiesSeed = new[]
         {
-            new { Name = "خدمات التنظيف", Description = "خدمات تنظيف المنازل والمكاتب والمنشآت", Icon = "specialty-icons/default.png" },
-            new { Name = "الأجهزة المنزلية", Description = "صيانة وإصلاح الأجهزة المنزلية", Icon = "specialty-icons/default.png" },
-            new { Name = "أعمال الكهرباء", Description = "تركيب وصيانة الأعطال الكهربائية", Icon = "specialty-icons/default.png" },
-            new { Name = "دهانات وتشطيبات وديكور", Description = "أعمال دهان وتشطيب وديكور داخلي", Icon = "specialty-icons/default.png" },
-            new { Name = "أعمال السباكة", Description = "إصلاح وتركيب تمديدات السباكة", Icon = "specialty-icons/default.png" },
-            new { Name = "صيانة التكييف", Description = "صيانة وتنظيف وتركيب أجهزة التكييف", Icon = "specialty-icons/default.png" },
-            new { Name = "أعمال الزراعة", Description = "خدمات الزراعة وتنسيق الحدائق", Icon = "specialty-icons/default.png" },
-            new { Name = "فني ستالايت", Description = "تركيب وضبط وصيانة أجهزة الستالايت", Icon = "specialty-icons/default.png" },
-            new { Name = "أعمال الألمنيوم", Description = "تصنيع وتركيب وصيانة الألمنيوم", Icon = "specialty-icons/default.png" },
-            new { Name = "أعمال النجارة", Description = "تصنيع وصيانة الأعمال الخشبية", Icon = "specialty-icons/default.png" },
-            new { Name = "حرفي", Description = "خدمات حرفية متنوعة", Icon = "specialty-icons/default.png" },
-            new { Name = "خدمات خزانات المياه", Description = "تنظيف وصيانة خزانات المياه", Icon = "specialty-icons/default.png" },
-            new { Name = "كاميرات المراقبة", Description = "تركيب وصيانة أنظمة المراقبة", Icon = "specialty-icons/default.png" },
-            new { Name = "أعمال الحدادة", Description = "تصنيع وصيانة أعمال الحدادة", Icon = "specialty-icons/default.png" }
+            new { Name = "خدمات التنظيف", Description = "خدمات تنظيف المنازل والمكاتب والمنشآت", Icon = defaultIconUrl },
+            new { Name = "الأجهزة المنزلية", Description = "صيانة وإصلاح الأجهزة المنزلية", Icon = defaultIconUrl },
+            new { Name = "أعمال الكهرباء", Description = "تركيب وصيانة الأعطال الكهربائية", Icon = defaultIconUrl },
+            new { Name = "دهانات وتشطيبات وديكور", Description = "أعمال دهان وتشطيب وديكور داخلي", Icon = defaultIconUrl },
+            new { Name = "أعمال السباكة", Description = "إصلاح وتركيب تمديدات السباكة", Icon = defaultIconUrl },
+            new { Name = "صيانة التكييف", Description = "صيانة وتنظيف وتركيب أجهزة التكييف", Icon = defaultIconUrl },
+            new { Name = "أعمال الزراعة", Description = "خدمات الزراعة وتنسيق الحدائق", Icon = defaultIconUrl },
+            new { Name = "فني ستالايت", Description = "تركيب وضبط وصيانة أجهزة الستالايت", Icon = defaultIconUrl },
+            new { Name = "أعمال الألمنيوم", Description = "تصنيع وتركيب وصيانة الألمنيوم", Icon = defaultIconUrl },
+            new { Name = "أعمال النجارة", Description = "تصنيع وصيانة الأعمال الخشبية", Icon = defaultIconUrl },
+            new { Name = "حرفي", Description = "خدمات حرفية متنوعة", Icon = defaultIconUrl },
+            new { Name = "خدمات خزانات المياه", Description = "تنظيف وصيانة خزانات المياه", Icon = defaultIconUrl },
+            new { Name = "كاميرات المراقبة", Description = "تركيب وصيانة أنظمة المراقبة", Icon = defaultIconUrl },
+            new { Name = "أعمال الحدادة", Description = "تصنيع وصيانة أعمال الحدادة", Icon = defaultIconUrl }
         };
 
-        var existingNames = await _context.Specialties
+        var existingSpecialties = await _context.Specialties.ToListAsync();
+
+        // Update existing specialties that have null or empty icons
+        foreach (var specialty in existingSpecialties)
+        {
+            if (string.IsNullOrWhiteSpace(specialty.Icon))
+            {
+                specialty.Icon = defaultIconUrl;
+            }
+        }
+
+        var existingNames = existingSpecialties
             .Select(s => s.Name)
-            .ToListAsync();
+            .ToList();
 
         var existingNormalized = existingNames
             .Select(NormalizeName)
@@ -58,13 +97,40 @@ public class SeedData: ISeedData
             })
             .ToList();
 
-        if (newSpecialties.Count == 0)
+        if (newSpecialties.Count > 0)
         {
-            return;
+            await _context.Specialties.AddRangeAsync(newSpecialties);
         }
 
-        await _context.Specialties.AddRangeAsync(newSpecialties);
         await _context.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Creates a minimal valid PNG file as a placeholder default icon.
+    /// This is a 1x1 pixel transparent PNG.
+    /// </summary>
+    private static void CreateDefaultIconFile(string filePath)
+    {
+        // Minimal 1x1 transparent PNG (PNG header + IHDR chunk + IDAT chunk + IEND chunk)
+        byte[] pngData = new byte[]
+        {
+            // PNG signature
+            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
+            // IHDR chunk (13 bytes data + 12 bytes header)
+            0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+            0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+            0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+            0x89,
+            // IDAT chunk (minimal data + 12 bytes header)
+            0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41, 0x54,
+            0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00, 0x05,
+            0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4,
+            // IEND chunk
+            0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44,
+            0xAE, 0x42, 0x60, 0x82
+        };
+
+        File.WriteAllBytes(filePath, pngData);
     }
 
     private static string NormalizeName(string value)

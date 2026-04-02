@@ -23,7 +23,10 @@ public class FileStorageService : IFileStorageService
             throw new ArgumentException("File cannot be empty.", nameof(file));
         }
 
-        var uploadDir = Path.Combine(_uploadRoot, subfolder, userId.ToString());
+        var hasUserScope = userId != Guid.Empty;
+        var uploadDir = hasUserScope
+            ? Path.Combine(_uploadRoot, subfolder, userId.ToString())
+            : Path.Combine(_uploadRoot, subfolder);
         Directory.CreateDirectory(uploadDir);
 
         var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
@@ -35,7 +38,9 @@ public class FileStorageService : IFileStorageService
         }
 
         // Return relative path for database storage
-        return Path.Combine("uploads", subfolder, userId.ToString(), fileName).Replace("\\", "/");
+        return hasUserScope
+            ? Path.Combine("uploads", subfolder, userId.ToString(), fileName).Replace("\\", "/")
+            : Path.Combine("uploads", subfolder, fileName).Replace("\\", "/");
     }
 
     public async Task DeleteFileAsync(string filePath)

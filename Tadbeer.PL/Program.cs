@@ -105,7 +105,7 @@ using (var scope = app.Services.CreateScope())
         await context.Database.MigrateAsync();
 
         var seedData = scope.ServiceProvider.GetRequiredService<ISeedData>();
-        await seedData.DataSeedingAsync();
+        await seedData.SpecialtiesDataSeedingAsync();
         await seedData.IdentityDataSeedingAsync();
     }
     catch (Exception ex)
