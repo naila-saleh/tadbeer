@@ -4,13 +4,14 @@ using System.Security.Claims;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
 using Tadbeer.DAL.DTO.Requests.Profile;
 using Tadbeer.DAL.DTO.Responses.Profile;
+using Tadbeer.DAL.Models;
 
 namespace Tadbeer.PL.Areas.User.Controllers;
 
 [Route("api/[area]/[controller]")]
 [ApiController]
 [Area("User")]
-[Authorize(Roles = "User")]
+[Authorize(Roles = nameof(UserRole.User))]
 public class ProfileController : ControllerBase
 {
     private readonly IApplicationUserService _userService;

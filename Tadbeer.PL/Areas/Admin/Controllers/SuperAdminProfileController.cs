@@ -4,13 +4,14 @@ using System.Security.Claims;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
 using Tadbeer.DAL.DTO.Requests.Profile;
 using Tadbeer.DAL.DTO.Responses.Profile;
+using Tadbeer.DAL.Models;
 
 namespace Tadbeer.PL.Areas.Admin.Controllers;
 
 [Route("api/[area]/[controller]")]
 [ApiController]
 [Area("Admin")]
-[Authorize(Roles = "SuperAdmin")]
+[Authorize(Roles = nameof(UserRole.SuperAdmin))]
 public class SuperAdminProfileController : ControllerBase
 {
     private readonly IApplicationUserService _userService;

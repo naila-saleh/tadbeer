@@ -61,14 +61,12 @@ public class ApplicationUserRepository : GenericRepository<ApplicationUser>, IAp
         return await _userManager.IsLockedOutAsync(user);
     }
 
-    public async Task<bool> ChangeUserRoleAsync(Guid userId, string newRole)
+    public async Task<bool> ChangeUserRoleAsync(Guid userId, UserRole newRole)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null) return false;
 
-        // Basic validation using explicit role names
-        var validRoles = new[] { "SuperAdmin", "Admin", "Worker", "User" };
-        if (!validRoles.Contains(newRole, StringComparer.OrdinalIgnoreCase))
+        if (!Enum.IsDefined(typeof(UserRole), newRole))
         {
             return false;
         }
@@ -77,7 +75,7 @@ public class ApplicationUserRepository : GenericRepository<ApplicationUser>, IAp
         var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
         if (!removeResult.Succeeded) return false;
 
-        var addResult = await _userManager.AddToRoleAsync(user, newRole);
+        var addResult = await _userManager.AddToRoleAsync(user, newRole.ToString());
         if (!addResult.Succeeded) return false;
 
         return true;

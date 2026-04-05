@@ -1,12 +1,15 @@
 using Mapster;
-using Tadbeer.DAL.DTO.Requests;
 using Tadbeer.DAL.DTO.Responses;
+using Tadbeer.DAL.DTO.Responses.Profile;
+using Tadbeer.DAL.DTO.Responses.WorkImages;
 using Tadbeer.DAL.Models;
 
 namespace Tadbeer.BLL.Profiles;
 
 public static class MapsterConfig
 {
+    private const string DefaultSpecialtyIconUrl = "specialty-icons/default.png";
+
     public static void RegisterMappings()
     {
         // Example configuration (Mapster handles basic properties by matching names automatically):
@@ -15,5 +18,62 @@ public static class MapsterConfig
         //     .IgnoreNullValues(true);
 
         // Add custom mapping rules here as your application grows
+
+        TypeAdapterConfig<ApplicationUser, ApplicationUserResponseDto>
+            .NewConfig()
+            .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.Status, src => src.Status.ToString())
+            .Map(dest => dest.Role, _ => UserRole.User);
+
+        TypeAdapterConfig<ApplicationUser, UserProfileResponseDto>
+            .NewConfig()
+            .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.Role, _ => UserRole.User)
+            .Map(dest => dest.Status, src => src.Status.ToString());
+
+        TypeAdapterConfig<ApplicationUser, WorkerProfileResponseDto>
+            .NewConfig()
+            .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.Role, _ => UserRole.Worker)
+            .Map(dest => dest.Status, src => src.Status.ToString())
+            .Map(dest => dest.SpecialtyIds,
+                src => src.WorkerSpecialties.Select(ws => ws.SpecialtyId).Distinct().ToList())
+            .Map(dest => dest.SpecialtyNames,
+                src => src.WorkerSpecialties
+                    .Select(ws => ws.Specialty.Name)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList());
+
+        TypeAdapterConfig<ApplicationUser, WorkerPublicProfileResponseDto>
+            .NewConfig()
+            .Map(dest => dest.SpecialtyIds,
+                src => src.WorkerSpecialties.Select(ws => ws.SpecialtyId).Distinct().ToList())
+            .Map(dest => dest.SpecialtyNames,
+                src => src.WorkerSpecialties
+                    .Select(ws => ws.Specialty.Name)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList());
+
+        TypeAdapterConfig<ApplicationUser, AdminProfileResponseDto>
+            .NewConfig()
+            .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.Role, _ => UserRole.Admin)
+            .Map(dest => dest.Status, src => src.Status.ToString());
+
+        TypeAdapterConfig<ApplicationUser, SuperAdminProfileResponseDto>
+            .NewConfig()
+            .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.Role, _ => UserRole.SuperAdmin)
+            .Map(dest => dest.Status, src => src.Status.ToString());
+
+        TypeAdapterConfig<WorkImage, WorkImageCreatedResponseDto>
+            .NewConfig();
+
+        TypeAdapterConfig<Specialty, SpecialtyResponseDto>
+            .NewConfig()
+            .Map(dest => dest.IconUrl,
+                src => string.IsNullOrWhiteSpace(src.Icon)
+                    ? DefaultSpecialtyIconUrl
+                    : src.Icon);
     }
 }

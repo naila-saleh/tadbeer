@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
 using Tadbeer.DAL.DTO.Requests;
 using Tadbeer.DAL.DTO.Responses;
+using Tadbeer.DAL.Models;
 
 namespace Tadbeer.PL.Areas.Admin.Controllers;
 
 [Route("api/[area]/[controller]")]
 [ApiController]
 [Area("Admin")]
-[Authorize(Roles = "Admin, SuperAdmin")]
+[Authorize(Roles = nameof(UserRole.Admin) + ", " + nameof(UserRole.SuperAdmin))]
 public class SpecialtiesController : ControllerBase
 {
     private readonly ISpecialtyService _specialtyService;

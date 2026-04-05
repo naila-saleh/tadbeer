@@ -27,16 +27,15 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
     public new async Task<IEnumerable<ApplicationUserResponseDto>> GetAllAsync()
     {
-        var users = await _repository.GetAllAsync();
+        var users = (await _repository.GetAllAsync()).ToList();
         var dtos = users.Adapt<List<ApplicationUserResponseDto>>();
         foreach (var dto in dtos)
         {
             var user = users.First(u => u.Id == dto.Id);
-            var roles = await _userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault() ?? "User";
+            var role = await GetPrimaryRoleAsync(user);
             dto.Role = role;
 
-            if (string.Equals(role, "Worker", StringComparison.OrdinalIgnoreCase))
+            if (role == UserRole.Worker)
             {
                 var workerWithRelations = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(user.Id);
                 var specialties = workerWithRelations?.WorkerSpecialties.ToList() ?? new List<WorkerSpecialty>();
@@ -45,13 +44,8 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
                     .Select(ws => ws.Specialty.Name)
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
-                dto.WorkingHours = workerWithRelations?.WorkingHours.Select(wh => new WorkingHoursResponseDto
-                {
-                    Id = wh.Id,
-                    DayOfWeek = wh.DayOfWeek,
-                    StartTime = wh.StartTime,
-                    EndTime = wh.EndTime
-                }).ToList() ?? new List<WorkingHoursResponseDto>();
+                dto.WorkingHours = workerWithRelations?.WorkingHours.Adapt<List<WorkingHoursResponseDto>>()
+                    ?? new List<WorkingHoursResponseDto>();
             }
         }
         return dtos;
@@ -63,11 +57,10 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         if (user == null) return null;
         
         var dto = user.Adapt<ApplicationUserResponseDto>();
-        var roles = await _userManager.GetRolesAsync(user);
-        var role = roles.FirstOrDefault() ?? "User";
+        var role = await GetPrimaryRoleAsync(user);
         dto.Role = role;
 
-        if (string.Equals(role, "Worker", StringComparison.OrdinalIgnoreCase))
+        if (role == UserRole.Worker)
         {
             var workerWithRelations = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(user.Id);
             var specialties = workerWithRelations?.WorkerSpecialties.ToList() ?? new List<WorkerSpecialty>();
@@ -76,13 +69,8 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
                 .Select(ws => ws.Specialty.Name)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
-            dto.WorkingHours = workerWithRelations?.WorkingHours.Select(wh => new WorkingHoursResponseDto
-            {
-                Id = wh.Id,
-                DayOfWeek = wh.DayOfWeek,
-                StartTime = wh.StartTime,
-                EndTime = wh.EndTime
-            }).ToList() ?? new List<WorkingHoursResponseDto>();
+            dto.WorkingHours = workerWithRelations?.WorkingHours.Adapt<List<WorkingHoursResponseDto>>()
+                ?? new List<WorkingHoursResponseDto>();
         }
 
         return dto;
@@ -91,7 +79,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
     public override async Task RemoveAsync(params object[] ids)
     {
         var user = await _userManager.FindByIdAsync(ids[0].ToString()!);
-        if (user != null && await _userManager.IsInRoleAsync(user, "SuperAdmin"))
+        if (user != null && await IsInRoleAsync(user, UserRole.SuperAdmin))
         {
             throw new UserOperationException("Cannot delete a SuperAdmin user.");
         }
@@ -101,7 +89,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
     public async Task<bool> BlockUserAsync(Guid id, int minutes)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
-        if (user != null && await _userManager.IsInRoleAsync(user, "SuperAdmin"))
+        if (user != null && await IsInRoleAsync(user, UserRole.SuperAdmin))
         {
             throw new UserOperationException("Cannot block a SuperAdmin user.");
         }
@@ -111,7 +99,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
     public async Task<bool> UnBlockUserAsync(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
-        if (user != null && await _userManager.IsInRoleAsync(user, "SuperAdmin"))
+        if (user != null && await IsInRoleAsync(user, UserRole.SuperAdmin))
         {
             throw new UserOperationException("Cannot unblock a SuperAdmin user.");
         }
@@ -121,7 +109,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
     public async Task<bool> IsBlockedAsync(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
-        if (user != null && await _userManager.IsInRoleAsync(user, "SuperAdmin"))
+        if (user != null && await IsInRoleAsync(user, UserRole.SuperAdmin))
         {
             throw new UserOperationException("Cannot check block status for a SuperAdmin user.");
         }
@@ -130,13 +118,13 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
     public async Task<bool> ChangeUserRoleAsync(Guid userId, ChangeRoleRequest request)
     {
-        if (string.Equals(request.Role, "SuperAdmin", StringComparison.OrdinalIgnoreCase))
+        if (request.Role == UserRole.SuperAdmin)
         {
             throw new UserOperationException("Cannot change a user's role to SuperAdmin.");
         }
 
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user != null && await _userManager.IsInRoleAsync(user, "SuperAdmin"))
+        if (user != null && await IsInRoleAsync(user, UserRole.SuperAdmin))
         {
             throw new UserOperationException("Cannot change the role of a SuperAdmin user.");
         }
@@ -147,18 +135,18 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
     public async Task<UserProfileResponseDto?> GetUserProfileAsync(Guid userId)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null || !await _userManager.IsInRoleAsync(user, "User"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.User))
         {
             return null;
         }
 
-        return MapToUserProfile(user);
+        return user.Adapt<UserProfileResponseDto>();
     }
 
     public async Task<UserProfileResponseDto?> UpdateUserProfileAsync(Guid userId, UserProfileUpdateRequestDto request)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null || !await _userManager.IsInRoleAsync(user, "User"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.User))
         {
             return null;
         }
@@ -167,35 +155,35 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         _unitOfWork.ApplicationUsers.Update(user);
         await _unitOfWork.CompleteAsync();
 
-        return MapToUserProfile(user);
+        return user.Adapt<UserProfileResponseDto>();
     }
 
     public async Task<WorkerProfileResponseDto?> GetWorkerProfileAsync(Guid userId)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
 
-        return MapToWorkerProfile(user);
+        return user.Adapt<WorkerProfileResponseDto>();
     }
 
     public async Task<WorkerPublicProfileResponseDto?> GetWorkerPublicProfileAsync(Guid workerId)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(workerId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
 
-        return MapToWorkerPublicProfile(user);
+        return user.Adapt<WorkerPublicProfileResponseDto>();
     }
 
     public async Task<WorkerProfileResponseDto?> UpdateWorkerProfileAsync(Guid userId, WorkerProfileUpdateRequestDto request)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
@@ -273,13 +261,13 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         await _unitOfWork.CompleteAsync();
 
         var refreshedUser = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        return refreshedUser == null ? null : MapToWorkerProfile(refreshedUser);
+        return refreshedUser?.Adapt<WorkerProfileResponseDto>();
     }
 
     public async Task<WorkerProfileResponseDto?> DeleteWorkerMainImageAsync(Guid userId, Guid mainImageId)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
@@ -306,13 +294,13 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         await _unitOfWork.CompleteAsync();
 
         var refreshedUser = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        return refreshedUser == null ? null : MapToWorkerProfile(refreshedUser);
+        return refreshedUser?.Adapt<WorkerProfileResponseDto>();
     }
 
     public async Task<WorkerProfileResponseDto?> DeleteWorkerSubImageAsync(Guid userId, Guid subImageId)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
@@ -332,36 +320,24 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         await _unitOfWork.CompleteAsync();
 
         var refreshedUser = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        return refreshedUser == null ? null : MapToWorkerProfile(refreshedUser);
+        return refreshedUser?.Adapt<WorkerProfileResponseDto>();
     }
 
     public async Task<IEnumerable<WorkerWorkImageResponseDto>?> GetWorkerMainImagesAsync(Guid userId)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
 
-        return user.WorkImages.Select(main => new WorkerWorkImageResponseDto
-        {
-            Id = main.Id,
-            ImageUrl = main.ImageUrl,
-            CreatedAt = main.CreatedAt,
-            UpdatedAt = main.UpdatedAt,
-            SubImages = main.SubImages.Select(sub => new WorkerWorkSubImageResponseDto
-            {
-                Id = sub.Id,
-                MainImageId = sub.MainImageId,
-                ImageUrl = sub.ImageUrl
-            }).ToList()
-        }).ToList();
+        return user.WorkImages.Adapt<List<WorkerWorkImageResponseDto>>();
     }
 
     public async Task<IEnumerable<WorkerWorkSubImageResponseDto>?> GetWorkerSubImagesAsync(Guid userId, Guid mainImageId)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
@@ -372,18 +348,13 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
-        return mainImage.SubImages.Select(sub => new WorkerWorkSubImageResponseDto
-        {
-            Id = sub.Id,
-            MainImageId = sub.MainImageId,
-            ImageUrl = sub.ImageUrl
-        }).ToList();
+        return mainImage.SubImages.Adapt<List<WorkerWorkSubImageResponseDto>>();
     }
 
     public async Task<WorkerProfileResponseDto?> AddWorkerSubImagesToMainImageAsync(Guid userId, Guid mainImageId, WorkerMainImageSubImagesRequestDto request)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
@@ -423,13 +394,13 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         await _unitOfWork.CompleteAsync();
 
         var refreshedUser = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        return refreshedUser == null ? null : MapToWorkerProfile(refreshedUser);
+        return refreshedUser?.Adapt<WorkerProfileResponseDto>();
     }
 
     public async Task<IEnumerable<WorkImageCreatedResponseDto>?> CreateWorkerWorkImagesAsync(Guid userId, CreateWorkImagesRequestDto request)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Worker"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
         {
             return null;
         }
@@ -465,12 +436,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
             await _unitOfWork.WorkImages.AddAsync(newMainImage);
 
-            createdImages.Add(new WorkImageCreatedResponseDto
-            {
-                Id = mainImageId,
-                ImageUrl = mainImageUrl,
-                CreatedAt = now
-            });
+            createdImages.Add(newMainImage.Adapt<WorkImageCreatedResponseDto>());
         }
 
         user.UpdatedAt = now;
@@ -488,8 +454,8 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
-        var isUser = await _userManager.IsInRoleAsync(user, "User");
-        var isWorker = await _userManager.IsInRoleAsync(user, "Worker");
+        var isUser = await IsInRoleAsync(user, UserRole.User);
+        var isWorker = await IsInRoleAsync(user, UserRole.Worker);
         if (!isUser && !isWorker)
         {
             throw new UserOperationException("Only User and Worker profiles can be temporarily deactivated.");
@@ -506,18 +472,18 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
     public async Task<AdminProfileResponseDto?> GetAdminProfileAsync(Guid userId)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Admin"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Admin))
         {
             return null;
         }
 
-        return MapToAdminProfile(user);
+        return user.Adapt<AdminProfileResponseDto>();
     }
 
     public async Task<AdminProfileResponseDto?> UpdateAdminProfileAsync(Guid userId, AdminProfileUpdateRequestDto request)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null || !await _userManager.IsInRoleAsync(user, "Admin"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.Admin))
         {
             return null;
         }
@@ -526,24 +492,24 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         _unitOfWork.ApplicationUsers.Update(user);
         await _unitOfWork.CompleteAsync();
 
-        return MapToAdminProfile(user);
+        return user.Adapt<AdminProfileResponseDto>();
     }
 
     public async Task<SuperAdminProfileResponseDto?> GetSuperAdminProfileAsync(Guid userId)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null || !await _userManager.IsInRoleAsync(user, "SuperAdmin"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.SuperAdmin))
         {
             return null;
         }
 
-        return MapToSuperAdminProfile(user);
+        return user.Adapt<SuperAdminProfileResponseDto>();
     }
 
     public async Task<SuperAdminProfileResponseDto?> UpdateSuperAdminProfileAsync(Guid userId, SuperAdminProfileUpdateRequestDto request)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user == null || !await _userManager.IsInRoleAsync(user, "SuperAdmin"))
+        if (user == null || !await IsInRoleAsync(user, UserRole.SuperAdmin))
         {
             return null;
         }
@@ -552,7 +518,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         _unitOfWork.ApplicationUsers.Update(user);
         await _unitOfWork.CompleteAsync();
 
-        return MapToSuperAdminProfile(user);
+        return user.Adapt<SuperAdminProfileResponseDto>();
     }
 
     private async Task ApplyBaseProfileUpdatesAsync(ApplicationUser user, BaseProfileUpdateRequestDto request)
@@ -596,144 +562,16 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         user.UpdatedAt = DateTime.UtcNow;
     }
 
-    private static UserProfileResponseDto MapToUserProfile(ApplicationUser user)
+    private async Task<UserRole> GetPrimaryRoleAsync(ApplicationUser user)
     {
-        return new UserProfileResponseDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email ?? string.Empty,
-            PhoneNumber = user.PhoneNumber,
-            City = user.City,
-            ProfileImage = user.ProfileImage,
-            Role = "User",
-            Status = user.Status.ToString(),
-            EmailConfirmed = user.EmailConfirmed
-        };
+        var roles = await _userManager.GetRolesAsync(user);
+        var roleName = roles.FirstOrDefault();
+        return Enum.TryParse<UserRole>(roleName, ignoreCase: true, out var role)
+            ? role
+            : UserRole.User;
     }
 
-    private static WorkerProfileResponseDto MapToWorkerProfile(ApplicationUser user)
-    {
-        return new WorkerProfileResponseDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email ?? string.Empty,
-            PhoneNumber = user.PhoneNumber,
-            City = user.City,
-            ProfileImage = user.ProfileImage,
-            Role = "Worker",
-            Status = user.Status.ToString(),
-            EmailConfirmed = user.EmailConfirmed,
-            JobDescription = user.JobDescription,
-            ExperienceYears = user.ExperienceYears,
-            AvgRating = user.AvgRating,
-            SpecialtyIds = user.WorkerSpecialties
-                .Select(ws => ws.SpecialtyId)
-                .Distinct()
-                .ToList(),
-            SpecialtyNames = user.WorkerSpecialties
-                .Select(ws => ws.Specialty.Name)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList(),
-            WorkingHours = user.WorkingHours.Select(wh => new WorkingHoursResponseDto
-            {
-                Id = wh.Id,
-                DayOfWeek = wh.DayOfWeek,
-                StartTime = wh.StartTime,
-                EndTime = wh.EndTime
-            }).ToList(),
-            WorkImages = user.WorkImages.Select(main => new WorkerWorkImageResponseDto
-            {
-                Id = main.Id,
-                ImageUrl = main.ImageUrl,
-                CreatedAt = main.CreatedAt,
-                UpdatedAt = main.UpdatedAt,
-                SubImages = main.SubImages.Select(sub => new WorkerWorkSubImageResponseDto
-                {
-                    Id = sub.Id,
-                    MainImageId = sub.MainImageId,
-                    ImageUrl = sub.ImageUrl
-                }).ToList()
-            }).ToList()
-        };
-    }
+    private Task<bool> IsInRoleAsync(ApplicationUser user, UserRole role)
+        => _userManager.IsInRoleAsync(user, role.ToString());
 
-    private static WorkerPublicProfileResponseDto MapToWorkerPublicProfile(ApplicationUser user)
-    {
-        return new WorkerPublicProfileResponseDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            City = user.City,
-            ProfileImage = user.ProfileImage,
-            JobDescription = user.JobDescription,
-            ExperienceYears = user.ExperienceYears,
-            AvgRating = user.AvgRating,
-            SpecialtyIds = user.WorkerSpecialties
-                .Select(ws => ws.SpecialtyId)
-                .Distinct()
-                .ToList(),
-            SpecialtyNames = user.WorkerSpecialties
-                .Select(ws => ws.Specialty.Name)
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToList(),
-            WorkingHours = user.WorkingHours.Select(wh => new WorkingHoursResponseDto
-            {
-                Id = wh.Id,
-                DayOfWeek = wh.DayOfWeek,
-                StartTime = wh.StartTime,
-                EndTime = wh.EndTime
-            }).ToList(),
-            WorkImages = user.WorkImages.Select(main => new WorkerPublicWorkImageResponseDto
-            {
-                ImageUrl = main.ImageUrl,
-                SubImages = main.SubImages.Select(sub => new WorkerPublicWorkSubImageResponseDto
-                {
-                    ImageUrl = sub.ImageUrl
-                }).ToList()
-            }).ToList()
-        };
-    }
-
-    private static AdminProfileResponseDto MapToAdminProfile(ApplicationUser user)
-    {
-        return new AdminProfileResponseDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email ?? string.Empty,
-            PhoneNumber = user.PhoneNumber,
-            City = user.City,
-            ProfileImage = user.ProfileImage,
-            Role = "Admin",
-            Status = user.Status.ToString(),
-            EmailConfirmed = user.EmailConfirmed,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt
-        };
-    }
-
-    private static SuperAdminProfileResponseDto MapToSuperAdminProfile(ApplicationUser user)
-    {
-        return new SuperAdminProfileResponseDto
-        {
-            Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email ?? string.Empty,
-            PhoneNumber = user.PhoneNumber,
-            City = user.City,
-            ProfileImage = user.ProfileImage,
-            Role = "SuperAdmin",
-            Status = user.Status.ToString(),
-            EmailConfirmed = user.EmailConfirmed,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt
-        };
-    }
 }

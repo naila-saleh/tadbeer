@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Tadbeer.BLL.Services.Interfaces;
@@ -60,7 +60,7 @@ public class AuthService : IAuthService
 
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, nameof(UserRole.User));
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var escapeToken = Uri.EscapeDataString(token);
             var emailUrl = $"{request.Scheme}://{request.Host}/api/identity/auth/confirm-email?token={escapeToken}&userId={user.Id}";

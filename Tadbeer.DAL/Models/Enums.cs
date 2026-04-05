@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace Tadbeer.DAL.Models;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum UserRole
 {
     SuperAdmin,
@@ -8,12 +11,14 @@ public enum UserRole
     User
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum UserStatus
 {
     Existed,
     Deleted
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum BookingStatus
 {
     Pending,
@@ -23,6 +28,7 @@ public enum BookingStatus
     Cancelled
 }
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum WeekDay
 {
     Saturday,

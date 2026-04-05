@@ -1,4 +1,6 @@
-﻿namespace Tadbeer.DAL.DTO.Responses.Profile;
+﻿using Tadbeer.DAL.Models;
+
+namespace Tadbeer.DAL.DTO.Responses.Profile;
 
 public class BaseProfileResponseDto
 {
@@ -9,6 +11,6 @@ public class BaseProfileResponseDto
     public string? PhoneNumber { get; set; }
     public string City { get; set; } = null!;
     public string ProfileImage { get; set; } = null!;
-    public string Role { get; set; } = null!;
+    public UserRole Role { get; set; }
 }
 

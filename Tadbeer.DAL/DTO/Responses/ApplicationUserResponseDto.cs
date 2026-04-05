@@ -12,7 +12,7 @@ public class ApplicationUserResponseDto
     public string City { get; set; } = null!;
     public string ProfileImage { get; set; } = null!;
 
-    public string Role { get; set; } = null!;
+    public UserRole Role { get; set; }
     public string Status { get; set; } = null!;
     public bool EmailConfirmed { get; set; }
 

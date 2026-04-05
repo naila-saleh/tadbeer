@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Tadbeer.BLL.Exceptions;
 using Tadbeer.BLL.Services.Interfaces;
@@ -28,19 +29,19 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
     public new async Task<IEnumerable<SpecialtyResponseDto>> GetAllAsync()
     {
         var specialties = await _repository.GetAllAsync();
-        return specialties.Select(MapToResponse).ToList();
+        return specialties.Select(s => s.Adapt<SpecialtyResponseDto>()).ToList();
     }
 
     public new async Task<SpecialtyResponseDto?> GetByIdAsync(params object[] ids)
     {
         var specialty = await _repository.GetByIdAsync(ids);
-        return specialty is null ? null : MapToResponse(specialty);
+        return specialty?.Adapt<SpecialtyResponseDto>();
     }
 
     public new async Task<IEnumerable<SpecialtyResponseDto>> FindAsync(System.Linq.Expressions.Expression<Func<Specialty, bool>> predicate)
     {
         var specialties = await _repository.FindAsync(predicate);
-        return specialties.Select(MapToResponse).ToList();
+        return specialties.Select(s => s.Adapt<SpecialtyResponseDto>()).ToList();
     }
 
     public override async Task<SpecialtyResponseDto> AddAsync(SpecialtyRequestDto dto)
@@ -100,7 +101,7 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
             throw new DuplicateSpecialtyException(DuplicateSpecialtyMessage);
         }
 
-        return MapToResponse(entity);
+        return entity.Adapt<SpecialtyResponseDto>();
     }
 
     public override async Task UpdateAsync(SpecialtyRequestDto dto, params object[] ids)
@@ -178,14 +179,6 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
         _repository.Remove(target);
         await _unitOfWork.CompleteAsync();
     }
-
-    private static SpecialtyResponseDto MapToResponse(Specialty s) => new()
-    {
-        Id = s.Id,
-        Name = s.Name,
-        Description = s.Description,
-        IconUrl = string.IsNullOrWhiteSpace(s.Icon) ? DefaultIconUrl : s.Icon
-    };
 
     private static bool CanDeleteIcon(string? iconPath)
         => !string.IsNullOrWhiteSpace(iconPath) &&

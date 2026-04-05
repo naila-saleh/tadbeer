@@ -17,7 +17,7 @@ namespace Tadbeer.PL.Areas.Worker.Controllers;
 [Route("api/[area]/[controller]")]
 [ApiController]
 [Area("Worker")]
-[Authorize(Roles = "Worker")]
+[Authorize(Roles = nameof(UserRole.Worker))]
 public class ProfileController : ControllerBase
 {
     private readonly IApplicationUserService _userService;

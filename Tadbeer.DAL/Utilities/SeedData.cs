@@ -147,10 +147,10 @@ public class SeedData: ISeedData
     {
         if (!await _roleManager.Roles.AnyAsync())
         {
-            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = "SuperAdmin", NormalizedName = "SUPERADMIN" });
-            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = "Admin", NormalizedName = "ADMIN" });
-            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = "Worker", NormalizedName = "WORKER" });
-            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = "User", NormalizedName = "USER" });
+            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = nameof(UserRole.SuperAdmin), NormalizedName = nameof(UserRole.SuperAdmin).ToUpperInvariant() });
+            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = nameof(UserRole.Admin), NormalizedName = nameof(UserRole.Admin).ToUpperInvariant() });
+            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = nameof(UserRole.Worker), NormalizedName = nameof(UserRole.Worker).ToUpperInvariant() });
+            await _roleManager.CreateAsync(new IdentityRole<Guid> { Name = nameof(UserRole.User), NormalizedName = nameof(UserRole.User).ToUpperInvariant() });
         }
         if(!await _userManager.Users.AnyAsync())
         {
@@ -219,10 +219,10 @@ public class SeedData: ISeedData
                 throw new InvalidOperationException("Failed to create one or more seeded users.");
             }
             
-            await _userManager.AddToRoleAsync(user1, "SuperAdmin");
-            await _userManager.AddToRoleAsync(user2, "Admin");
-            await _userManager.AddToRoleAsync(user3, "Worker");
-            await _userManager.AddToRoleAsync(user4, "User");
+            await _userManager.AddToRoleAsync(user1, nameof(UserRole.SuperAdmin));
+            await _userManager.AddToRoleAsync(user2, nameof(UserRole.Admin));
+            await _userManager.AddToRoleAsync(user3, nameof(UserRole.Worker));
+            await _userManager.AddToRoleAsync(user4, nameof(UserRole.User));
         }
         await _context.SaveChangesAsync();
     }

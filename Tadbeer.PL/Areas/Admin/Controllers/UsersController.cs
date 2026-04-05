@@ -11,7 +11,7 @@ namespace Tadbeer.PL.Areas.Admin.Controllers;
 [Route("api/[area]/[controller]")]
 [ApiController]
 [Area("Admin")]
-[Authorize(Roles = "Admin, SuperAdmin")]
+[Authorize(Roles = nameof(UserRole.Admin) + ", " + nameof(UserRole.SuperAdmin))]
 public class UsersController : ControllerBase
 {
     private readonly IApplicationUserService _userService;
@@ -70,7 +70,7 @@ public class UsersController : ControllerBase
         return Ok(new { isBlocked = result });
     }
 
-    [Authorize(Roles = "SuperAdmin")]
+    [Authorize(Roles = nameof(UserRole.SuperAdmin))]
     [HttpPost("{id}/change-role")]
     public async Task<IActionResult> ChangeUserRole(Guid id, [FromBody] ChangeRoleRequest request)
     {
