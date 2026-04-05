@@ -218,20 +218,28 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             }
 
 
-            var existingSpecialties = user.WorkerSpecialties.ToList();
-            if (existingSpecialties.Count > 0)
+            var currentSpecialtyIds = user.WorkerSpecialties.Select(ws => ws.SpecialtyId).ToHashSet();
+            var newSpecialtyIds = specialtyList.Select(s => s.Id).ToHashSet();
+
+            // Remove specialties not in the new list
+            var toRemove = user.WorkerSpecialties.Where(ws => !newSpecialtyIds.Contains(ws.SpecialtyId)).ToList();
+            if (toRemove.Count > 0)
             {
-                _unitOfWork.WorkerSpecialties.RemoveRange(existingSpecialties);
+                _unitOfWork.WorkerSpecialties.RemoveRange(toRemove);
             }
 
-            foreach (var specialty in specialtyList)
+            // Add new specialties
+            foreach (var specialtyId in newSpecialtyIds)
             {
-                var workerSpecialty = new WorkerSpecialty
+                if (!currentSpecialtyIds.Contains(specialtyId))
                 {
-                    WorkerId = user.Id,
-                    SpecialtyId = specialty.Id
-                };
-                await _unitOfWork.WorkerSpecialties.AddAsync(workerSpecialty);
+                    var workerSpecialty = new WorkerSpecialty
+                    {
+                        WorkerId = user.Id,
+                        SpecialtyId = specialtyId
+                    };
+                    await _unitOfWork.WorkerSpecialties.AddAsync(workerSpecialty);
+                }
             }
         }
 
