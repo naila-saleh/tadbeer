@@ -14,11 +14,11 @@ public class AuthService : IAuthService
     private readonly IEmailSender _emailSender;
     private readonly IGenerateJWTService _generateJwtService;
 
-    public AuthService(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IGenerateJWTService generateJWTService)
+    public AuthService(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IGenerateJWTService generateJwtService)
     {
         _userManager = userManager;
         _emailSender = emailSender;
-        _generateJwtService = generateJWTService;
+        _generateJwtService = generateJwtService;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto model, HttpRequest request)
@@ -31,6 +31,16 @@ public class AuthService : IAuthService
                 IsSuccess = false,
                 Message = "User already exists with this email.",
                 Errors = new[] { "Email already in use." }
+            };
+        }
+
+        if (model.Role is not (UserRole.User or UserRole.Worker))
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "Only User and Worker roles are allowed during registration.",
+                Errors = new[] { "Invalid registration role." }
             };
         }
 
@@ -60,7 +70,7 @@ public class AuthService : IAuthService
 
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(user, nameof(UserRole.User));
+            await _userManager.AddToRoleAsync(user, model.Role.ToString());
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var escapeToken = Uri.EscapeDataString(token);
             var emailUrl = $"{request.Scheme}://{request.Host}/api/identity/auth/confirm-email?token={escapeToken}&userId={user.Id}";
