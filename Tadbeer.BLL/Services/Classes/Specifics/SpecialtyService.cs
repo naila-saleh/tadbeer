@@ -15,7 +15,7 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
 {
     private const string DuplicateSpecialtyMessage = "Specialty already exists.";
     private const string DefaultIconUrl = "specialty-icons/default.png";
-    private static readonly string[] AllowedIconExtensions = [".jpg", ".jpeg", ".png", ".svg"];
+    private static readonly string[] AllowedIconExtensions = [".jpg", ".jpeg", ".png", ".svg", ".webp"];
     private const long MaxIconSizeBytes = 10 * 1024 * 1024; // 10 MB
 
     private readonly IFileStorageService _fileStorageService;
@@ -86,7 +86,7 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
         if (!_fileStorageService.ValidateFile(dto.Icon, AllowedIconExtensions, MaxIconSizeBytes))
         {
             throw new UserOperationException(
-                "Invalid icon file. Allowed: jpg, jpeg, png, svg. Max size: 10 MB.");
+                "Invalid icon file. Allowed: jpg, jpeg, png, svg, webp. Max size: 10 MB.");
         }
 
         entity.Icon = await _fileStorageService.SaveFileAsync(dto.Icon, "specialty-icons", Guid.Empty);
@@ -139,7 +139,7 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
             if (!_fileStorageService.ValidateFile(dto.Icon, AllowedIconExtensions, MaxIconSizeBytes))
             {
                 throw new UserOperationException(
-                    "Invalid icon file. Allowed: jpg, jpeg, png, svg. Max size: 10 MB.");
+                    "Invalid icon file. Allowed: jpg, jpeg, png, svg, webp. Max size: 10 MB.");
             }
 
             // Delete old icon if present.
