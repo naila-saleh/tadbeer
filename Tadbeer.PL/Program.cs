@@ -87,14 +87,24 @@ builder.Services.AddCors(options =>
         policy
             .SetIsOriginAllowed(origin =>
             {
-                if(!Uri.TryCreate(origin, UriKind.Absolute, out var uri))return false;
-                if(uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) || uri.Host.Equals("127.0.0.1") || uri.Host.Equals("::1")) return true;
-                return uri.Host.Equals("https://tadbeer0.onrender.com", StringComparison.OrdinalIgnoreCase) || uri.Host.Equals("http://tadbeer0.onrender.com", StringComparison.OrdinalIgnoreCase);
+                if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+                {
+                    return false;
+                }
+
+                // Allow local development from any localhost/loopback port.
+                if (uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+                    uri.Host.Equals("127.0.0.1") ||
+                    uri.Host.Equals("::1"))
+                {
+                    return true;
+                }
+
+                // Allow deployed frontend/backend host.
+                return uri.Host.Equals("tadbeer0.onrender.com", StringComparison.OrdinalIgnoreCase);
             })
             .AllowAnyHeader()
             .AllowAnyMethod();
-        // If you use cookies/auth across origins, you'll also need:
-        // .AllowCredentials();
     });
 });
 
@@ -126,9 +136,10 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
-// CORS (if needed) should generally run before auth
+// CORS should run before auth so OPTIONS preflight succeeds.
 app.UseCors(userPolicy);
+
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<Tadbeer.PL.Middlewares.CheckUserStatusMiddleware>();
 
