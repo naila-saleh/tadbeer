@@ -124,8 +124,18 @@ using (var scope = app.Services.CreateScope())
         await context.Database.MigrateAsync();
 
         var seedData = scope.ServiceProvider.GetRequiredService<ISeedData>();
-        await seedData.SpecialtiesDataSeedingAsync();
-        await seedData.IdentityDataSeedingAsync();
+
+        // Run all seeds only once on first bootstrap in Development.
+        var shouldRunInitialSeeding = app.Environment.IsDevelopment()
+                                      && !await context.Specialties.AnyAsync()
+                                      && !await context.Roles.AnyAsync()
+                                      && !await context.Users.AnyAsync();
+
+        if (shouldRunInitialSeeding)
+        {
+            await seedData.SpecialtiesDataSeedingAsync();
+            await seedData.IdentityDataSeedingAsync();
+        }
     }
     catch (Exception ex)
     {
