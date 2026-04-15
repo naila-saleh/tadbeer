@@ -77,6 +77,12 @@ public static class MapsterConfig
                     ? DefaultSpecialtyIconUrl
                     : src.Icon);
 
+        TypeAdapterConfig<WorkingHoursRequestDto, WorkingHours>
+            .NewConfig();
+
+        TypeAdapterConfig<WorkingHours, WorkingHoursResponseDto>
+            .NewConfig();
+
         TypeAdapterConfig<BookingRequestDto, Booking>
             .NewConfig();
 
