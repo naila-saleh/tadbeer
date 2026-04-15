@@ -1,4 +1,4 @@
- using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Tadbeer.BLL.Services.Interfaces;
@@ -74,12 +74,24 @@ public class AuthService : IAuthService
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var escapeToken = Uri.EscapeDataString(token);
             var emailUrl = $"{request.Scheme}://{request.Host}/api/identity/auth/confirm-email?token={escapeToken}&userId={user.Id}";
-            await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
-            $"Please confirm your email by clicking here: <a href='{emailUrl}'>Confirm Email</a>");
+
+            var emailFailed = false;
+            try
+            {
+                await _emailSender.SendEmailAsync(user.Email, "Confirm your email",
+                    $"Please confirm your email by clicking here: <a href='{emailUrl}'>Confirm Email</a>");
+            }
+            catch
+            {
+                emailFailed = true;
+            }
+
             return new AuthResponseDto
             {
                 IsSuccess = true,
-                Message = "User created successfully."
+                Message = emailFailed
+                    ? "User created successfully, but confirmation email could not be sent."
+                    : "User created successfully."
             };
         }
 
@@ -189,8 +201,19 @@ public class AuthService : IAuthService
 
         await _userManager.UpdateAsync(user);
 
-        await _emailSender.SendEmailAsync(user.Email!, "Reset your password",
-            $"Your password reset code is: <strong>{code}</strong>. It expires in 15 minutes.");
+        try
+        {
+            await _emailSender.SendEmailAsync(user.Email!, "Reset your password",
+                $"Your password reset code is: <strong>{code}</strong>. It expires in 15 minutes.");
+        }
+        catch
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "Failed to send reset password email. Please verify SMTP settings."
+            };
+        }
 
         return new AuthResponseDto
         {
@@ -239,7 +262,14 @@ public class AuthService : IAuthService
             user.ExpirationCodeResetPassword = null;
             await _userManager.UpdateAsync(user);
 
-            await _emailSender.SendEmailAsync(model.Email, "Reset Password", "<h1>Password Changed Successfully</h1>");
+            try
+            {
+                await _emailSender.SendEmailAsync(model.Email, "Reset Password", "<h1>Password Changed Successfully</h1>");
+            }
+            catch
+            {
+                // Password reset is already successful; ignore notification email failures.
+            }
 
             return new AuthResponseDto
             {
