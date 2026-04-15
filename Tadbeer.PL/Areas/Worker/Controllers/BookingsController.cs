@@ -83,6 +83,23 @@ public class BookingsController : ControllerBase
         return Ok(cancelled);
     }
 
+    [HttpPatch("{id:guid}/complete")]
+    public async Task<ActionResult<BookingResponseDto>> Complete(Guid id)
+    {
+        if (!TryGetCurrentWorkerId(out var workerId))
+        {
+            return Unauthorized();
+        }
+
+        var completed = await _bookingService.CompleteForWorkerAsync(workerId, id);
+        if (completed == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(completed);
+    }
+
     private bool TryGetCurrentWorkerId(out Guid workerId)
     {
         var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);

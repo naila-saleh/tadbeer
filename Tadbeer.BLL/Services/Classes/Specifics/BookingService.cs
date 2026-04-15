@@ -188,6 +188,29 @@ public class BookingService : GenericService<BookingRequestDto, BookingResponseD
         return updated?.Adapt<BookingResponseDto>();
     }
 
+    public async Task<BookingResponseDto?> CompleteForWorkerAsync(Guid workerId, Guid bookingId)
+    {
+        var booking = await _unitOfWork.Bookings.GetByIdAsync(bookingId);
+        if (booking == null || booking.WorkerId != workerId)
+        {
+            return null;
+        }
+
+        if (booking.Status != BookingStatus.Accepted)
+        {
+            throw new UserOperationException("Only accepted bookings can be completed.");
+        }
+
+        booking.Status = BookingStatus.Completed;
+        booking.UpdatedAt = DateTime.UtcNow;
+
+        _unitOfWork.Bookings.Update(booking);
+        await _unitOfWork.CompleteAsync();
+
+        var updated = await _unitOfWork.Bookings.GetByIdWithDetailsAsync(bookingId);
+        return updated?.Adapt<BookingResponseDto>();
+    }
+
     public async Task<BookingResponseDto?> GetForWorkerByIdAsync(Guid workerId, Guid bookingId)
     {
         var booking = await _unitOfWork.Bookings.GetByIdForWorkerAsync(bookingId, workerId);

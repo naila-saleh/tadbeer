@@ -15,6 +15,7 @@ public interface IBookingService : IGenericService<BookingRequestDto, BookingRes
 
 	Task<BookingResponseDto?> AcceptForWorkerAsync(Guid workerId, Guid bookingId);
 	Task<BookingResponseDto?> CancelForWorkerAsync(Guid workerId, Guid bookingId);
+	Task<BookingResponseDto?> CompleteForWorkerAsync(Guid workerId, Guid bookingId);
 	Task<BookingResponseDto?> GetForWorkerByIdAsync(Guid workerId, Guid bookingId);
 	Task<BookingPagedResponseDto> GetForWorkerPagedAsync(Guid workerId, int pageNumber, int pageSize);
 

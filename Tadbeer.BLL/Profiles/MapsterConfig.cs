@@ -104,5 +104,23 @@ public static class MapsterConfig
             .Map(dest => dest.WorkingDay, src => src.WorkingHour.DayOfWeek)
             .Map(dest => dest.WorkingHourStart, src => src.WorkingHour.StartTime)
             .Map(dest => dest.WorkingHourEnd, src => src.WorkingHour.EndTime);
+
+        TypeAdapterConfig<ReviewRequestDto, Review>
+            .NewConfig();
+
+        TypeAdapterConfig<ReviewUpdateRequestDto, Review>
+            .NewConfig()
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.BookingId)
+            .Ignore(dest => dest.Booking)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.UpdatedAt);
+
+        TypeAdapterConfig<Review, ReviewResponseDto>
+            .NewConfig()
+            .Map(dest => dest.UserId, src => src.Booking.UserId)
+            .Map(dest => dest.WorkerId, src => src.Booking.WorkerId)
+            .Map(dest => dest.UserName, src => $"{src.Booking.User.FirstName} {src.Booking.User.LastName}".Trim())
+            .Map(dest => dest.WorkerName, src => $"{src.Booking.Worker.FirstName} {src.Booking.Worker.LastName}".Trim());
     }
 }
