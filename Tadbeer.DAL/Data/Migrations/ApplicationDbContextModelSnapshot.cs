@@ -324,6 +324,12 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -356,6 +362,8 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.ToTable("Bookings", t =>
                         {
                             t.HasCheckConstraint("CK_Bookings_Status", "[Status] IN ('Pending','Accepted','Rejected','Completed','Cancelled')");
+
+                            t.HasCheckConstraint("CK_Bookings_TimeRange", "[StartTime] < [EndTime]");
                         });
                 });
 

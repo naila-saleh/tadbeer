@@ -149,6 +149,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         builder.Entity<Booking>(e =>
         {
+            e.Property(x => x.StartTime)
+                .IsRequired();
+
+            e.Property(x => x.EndTime)
+                .IsRequired();
+
             e.Property(x => x.Status)
                 .HasConversion<string>()
                 .HasMaxLength(255)
@@ -161,6 +167,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.HasCheckConstraint(
                 "CK_Bookings_Status",
                 "[Status] IN ('Pending','Accepted','Rejected','Completed','Cancelled')"
+            );
+
+            e.HasCheckConstraint(
+                "CK_Bookings_TimeRange",
+                "[StartTime] < [EndTime]"
             );
 
             e.HasOne(x => x.User)

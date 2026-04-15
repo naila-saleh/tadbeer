@@ -1,4 +1,5 @@
 using Mapster;
+using Tadbeer.DAL.DTO.Requests;
 using Tadbeer.DAL.DTO.Responses;
 using Tadbeer.DAL.DTO.Responses.Profile;
 using Tadbeer.DAL.DTO.Responses.WorkImages;
@@ -75,5 +76,33 @@ public static class MapsterConfig
                 src => string.IsNullOrWhiteSpace(src.Icon)
                     ? DefaultSpecialtyIconUrl
                     : src.Icon);
+
+        TypeAdapterConfig<BookingRequestDto, Booking>
+            .NewConfig();
+
+        TypeAdapterConfig<BookingUpdateRequestDto, Booking>
+            .NewConfig()
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.UserId)
+            .Ignore(dest => dest.WorkerId)
+            .Ignore(dest => dest.Status)
+            .Ignore(dest => dest.CreatedAt)
+            .Ignore(dest => dest.UpdatedAt)
+            .Ignore(dest => dest.User)
+            .Ignore(dest => dest.Worker)
+            .Ignore(dest => dest.WorkingHour)
+            .Ignore(dest => dest.Review);
+
+        TypeAdapterConfig<Booking, BookingResponseDto>
+            .NewConfig()
+            .Map(dest => dest.DurationMinutes,
+                src => (int)Math.Max(0, (src.EndTime.ToTimeSpan() - src.StartTime.ToTimeSpan()).TotalMinutes))
+            .Map(dest => dest.UserName,
+                src => $"{src.User.FirstName} {src.User.LastName}".Trim())
+            .Map(dest => dest.WorkerName,
+                src => $"{src.Worker.FirstName} {src.Worker.LastName}".Trim())
+            .Map(dest => dest.WorkingDay, src => src.WorkingHour.DayOfWeek)
+            .Map(dest => dest.WorkingHourStart, src => src.WorkingHour.StartTime)
+            .Map(dest => dest.WorkingHourEnd, src => src.WorkingHour.EndTime);
     }
 }

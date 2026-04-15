@@ -11,6 +11,8 @@ public class Booking
     public ApplicationUser Worker { get; set; } = null!;
 
     public DateTime BookingDate { get; set; }
+    public TimeOnly StartTime { get; set; }
+    public TimeOnly EndTime { get; set; }
     public BookingStatus Status { get; set; } = BookingStatus.Pending;
 
     public DateTime CreatedAt { get; set; }

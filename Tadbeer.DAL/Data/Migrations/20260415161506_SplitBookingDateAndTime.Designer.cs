@@ -12,8 +12,8 @@ using Tadbeer.DAL.Data;
 namespace Tadbeer.DAL.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260309205540_Initial")]
-    partial class Initial
+    [Migration("20260415161506_SplitBookingDateAndTime")]
+    partial class SplitBookingDateAndTime
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -209,6 +209,9 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("CodeResetPassword")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -225,6 +228,9 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.Property<long?>("ExperienceYears")
                         .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ExpirationCodeResetPassword")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -267,13 +273,6 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasDefaultValue("User");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -308,14 +307,10 @@ namespace Tadbeer.DAL.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("City", "Role");
-
-                    b.HasIndex("Role", "Status");
+                    b.HasIndex("Status");
 
                     b.ToTable("AspNetUsers", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ApplicationUser_Role", "[Role] IN ('Admin','Worker','User')");
-
                             t.HasCheckConstraint("CK_ApplicationUser_Status", "[Status] IN ('Existed','Deleted')");
                         });
                 });
@@ -331,6 +326,12 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -364,6 +365,8 @@ namespace Tadbeer.DAL.Data.Migrations
                     b.ToTable("Bookings", t =>
                         {
                             t.HasCheckConstraint("CK_Bookings_Status", "[Status] IN ('Pending','Accepted','Rejected','Completed','Cancelled')");
+
+                            t.HasCheckConstraint("CK_Bookings_TimeRange", "[StartTime] < [EndTime]");
                         });
                 });
 
@@ -429,6 +432,16 @@ namespace Tadbeer.DAL.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -436,7 +449,15 @@ namespace Tadbeer.DAL.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Specialties");
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Specialties", t =>
+                        {
+                            t.HasCheckConstraint("CK_Specialty_Description_NotEmpty", "LEN(LTRIM(RTRIM([Description]))) > 0");
+
+                            t.HasCheckConstraint("CK_Specialty_Icon_NotEmpty", "LEN(LTRIM(RTRIM([Icon]))) > 0");
+                        });
                 });
 
             modelBuilder.Entity("Tadbeer.DAL.Models.WorkImage", b =>

@@ -1,6 +1,0 @@
-@Tadbeer.PL_HostAddress = http://localhost:5129
-
-GET {{Tadbeer.PL_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
