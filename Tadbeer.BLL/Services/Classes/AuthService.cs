@@ -5,6 +5,7 @@ using Tadbeer.BLL.Services.Interfaces;
 using Tadbeer.DAL.DTO.Requests;
 using Tadbeer.DAL.DTO.Responses;
 using Tadbeer.DAL.Models;
+using Tadbeer.DAL.Repositories.Interfaces;
 
 namespace Tadbeer.BLL.Services.Classes;
 
@@ -13,12 +14,14 @@ public class AuthService : IAuthService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IEmailSender _emailSender;
     private readonly IGenerateJWTService _generateJwtService;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AuthService(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IGenerateJWTService generateJwtService)
+    public AuthService(UserManager<ApplicationUser> userManager, IEmailSender emailSender, IGenerateJWTService generateJwtService, IUnitOfWork unitOfWork)
     {
         _userManager = userManager;
         _emailSender = emailSender;
         _generateJwtService = generateJwtService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto model, HttpRequest request)
@@ -61,16 +64,24 @@ public class AuthService : IAuthService
             UpdatedAt = DateTime.UtcNow
         };
 
-        if (!string.IsNullOrEmpty(model.PhoneNumber))
-        {
-            user.PhoneNumber = model.PhoneNumber;
-        }
-
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
         {
             await _userManager.AddToRoleAsync(user, model.Role.ToString());
+
+            if (!string.IsNullOrWhiteSpace(model.PhoneNumber))
+            {
+                await _unitOfWork.PhoneNumbers.AddAsync(new PhoneNumber
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    Number = model.PhoneNumber.Trim(),
+                    CreatedAt = DateTime.UtcNow
+                });
+                await _unitOfWork.CompleteAsync();
+            }
+
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var escapeToken = Uri.EscapeDataString(token);
             var emailUrl = $"{request.Scheme}://{request.Host}/api/identity/auth/confirm-email?token={escapeToken}&userId={user.Id}";

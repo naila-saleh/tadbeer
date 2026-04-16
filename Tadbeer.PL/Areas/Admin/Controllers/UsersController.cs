@@ -23,16 +23,16 @@ public class UsersController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ApplicationUserResponseDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<AdminUserListResponseDto>>> GetAll()
     {
-        var users = await _userService.GetAllAsync();
+        var users = await _userService.GetAdminUsersListAsync();
         return Ok(users);
     }
     
     [HttpGet("{id}")]
-    public async Task<ActionResult<ApplicationUserResponseDto>> GetById(Guid id)
+    public async Task<ActionResult<AdminUserDetailResponseDto>> GetById(Guid id)
     {
-        var user = await _userService.GetByIdAsync(id);
+        var user = await _userService.GetAdminUserDetailAsync(id);
         if (user == null)
         {
             return NotFound();

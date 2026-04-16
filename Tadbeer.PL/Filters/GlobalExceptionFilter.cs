@@ -20,9 +20,10 @@ public class GlobalExceptionFilter : IExceptionFilter
         if (context.Exception is DbUpdateException dbEx &&
             IsUniqueConstraintViolation(dbEx))
         {
+            var message = ResolveUniqueViolationMessage(dbEx);
             context.Result = new ConflictObjectResult(new
             {
-                message = "Specialty already exists."
+                message
             });
             context.ExceptionHandled = true;
             return;
@@ -39,5 +40,24 @@ public class GlobalExceptionFilter : IExceptionFilter
     {
         return exception.InnerException is SqlException sqlEx &&
                (sqlEx.Number == 2601 || sqlEx.Number == 2627);
+    }
+
+    private static string ResolveUniqueViolationMessage(DbUpdateException exception)
+    {
+        var details = exception.InnerException?.Message ?? exception.Message;
+
+        if (details.Contains("PhoneNumbers", StringComparison.OrdinalIgnoreCase)
+            || details.Contains("IX_PhoneNumbers_Number", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Phone number already exists.";
+        }
+
+        if (details.Contains("Specialties", StringComparison.OrdinalIgnoreCase)
+            || details.Contains("IX_Specialties_Name", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Specialty already exists.";
+        }
+
+        return "A duplicate value already exists.";
     }
 }

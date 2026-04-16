@@ -16,9 +16,18 @@ public class ApplicationUserRepository : GenericRepository<ApplicationUser>, IAp
         _userManager = userManager;
     }
 
+    public async Task<IEnumerable<ApplicationUser>> GetAllWithPhoneNumbersAsync()
+    {
+        return await _context.Users
+            .Include(u => u.PhoneNumbers)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
     public async Task<ApplicationUser?> GetByIdWithWorkImagesAsync(Guid userId)
     {
         return await _context.Users
+            .Include(u => u.PhoneNumbers)
             .Include(u => u.WorkImages)
             .ThenInclude(wi => wi.SubImages)
             .Include(u => u.WorkerSpecialties)

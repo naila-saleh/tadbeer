@@ -12,6 +12,8 @@ public interface IApplicationUserService : IGenericService<ApplicationUserReques
 {
     new Task<IEnumerable<ApplicationUserResponseDto>> GetAllAsync();
     new Task<ApplicationUserResponseDto?> GetByIdAsync(params object[] ids);
+    Task<IEnumerable<AdminUserListResponseDto>> GetAdminUsersListAsync();
+    Task<AdminUserDetailResponseDto?> GetAdminUserDetailAsync(Guid id);
     Task<bool> BlockUserAsync(Guid id, int days);
     Task<bool> UnBlockUserAsync(Guid id);
     Task<bool> IsBlockedAsync(Guid id);

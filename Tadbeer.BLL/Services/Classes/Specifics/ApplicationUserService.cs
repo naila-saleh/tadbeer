@@ -27,13 +27,18 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
     public new async Task<IEnumerable<ApplicationUserResponseDto>> GetAllAsync()
     {
-        var users = (await _repository.GetAllAsync()).ToList();
+        var users = (await _unitOfWork.ApplicationUsers.GetAllWithPhoneNumbersAsync()).ToList();
         var dtos = users.Adapt<List<ApplicationUserResponseDto>>();
         foreach (var dto in dtos)
         {
             var user = users.First(u => u.Id == dto.Id);
             var role = await GetPrimaryRoleAsync(user);
             dto.Role = role;
+            dto.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
+            dto.PhoneNumbers = user.PhoneNumbers
+                .OrderBy(p => p.CreatedAt)
+                .ThenBy(p => p.Number)
+                .Adapt<List<PhoneNumberResponseDto>>();
 
             if (role == UserRole.Worker)
             {
@@ -55,10 +60,17 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
     {
         var user = await _repository.GetByIdAsync(ids);
         if (user == null) return null;
+
+        var userWithRelations = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(user.Id) ?? user;
         
-        var dto = user.Adapt<ApplicationUserResponseDto>();
-        var role = await GetPrimaryRoleAsync(user);
+        var dto = userWithRelations.Adapt<ApplicationUserResponseDto>();
+        var role = await GetPrimaryRoleAsync(userWithRelations);
         dto.Role = role;
+        dto.PhoneNumber = await GetPrimaryPhoneNumberAsync(userWithRelations.Id);
+        dto.PhoneNumbers = userWithRelations.PhoneNumbers
+            .OrderBy(p => p.CreatedAt)
+            .ThenBy(p => p.Number)
+            .Adapt<List<PhoneNumberResponseDto>>();
 
         if (role == UserRole.Worker)
         {
@@ -71,6 +83,74 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
                 .ToList();
             dto.WorkingHours = workerWithRelations?.WorkingHours.Adapt<List<WorkingHoursResponseDto>>()
                 ?? new List<WorkingHoursResponseDto>();
+        }
+
+        return dto;
+    }
+
+    public async Task<IEnumerable<AdminUserListResponseDto>> GetAdminUsersListAsync()
+    {
+        var users = (await _unitOfWork.ApplicationUsers.GetAllWithPhoneNumbersAsync()).ToList();
+        var result = new List<AdminUserListResponseDto>(users.Count);
+
+        foreach (var user in users)
+        {
+            var role = await GetPrimaryRoleAsync(user);
+            var primaryPhone = user.PhoneNumbers
+                .OrderBy(p => p.CreatedAt)
+                .ThenBy(p => p.Number)
+                .Select(p => p.Number)
+                .FirstOrDefault();
+
+            result.Add(new AdminUserListResponseDto
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email ?? string.Empty,
+                PrimaryPhoneNumber = primaryPhone,
+                PhoneNumbersCount = user.PhoneNumbers.Count,
+                City = user.City,
+                ProfileImage = user.ProfileImage,
+                Role = role,
+                Status = user.Status.ToString(),
+                EmailConfirmed = user.EmailConfirmed
+            });
+        }
+
+        return result;
+    }
+
+    public async Task<AdminUserDetailResponseDto?> GetAdminUserDetailAsync(Guid id)
+    {
+        var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(id);
+        if (user == null)
+        {
+            return null;
+        }
+
+        var dto = user.Adapt<AdminUserDetailResponseDto>();
+        var role = await GetPrimaryRoleAsync(user);
+        dto.Role = role;
+        dto.PrimaryPhoneNumber = user.PhoneNumbers
+            .OrderBy(p => p.CreatedAt)
+            .ThenBy(p => p.Number)
+            .Select(p => p.Number)
+            .FirstOrDefault();
+        dto.PhoneNumbers = user.PhoneNumbers
+            .OrderBy(p => p.CreatedAt)
+            .ThenBy(p => p.Number)
+            .Adapt<List<PhoneNumberResponseDto>>();
+
+        if (role == UserRole.Worker)
+        {
+            var specialties = user.WorkerSpecialties.ToList();
+            dto.SpecialtyIds = specialties.Select(ws => ws.SpecialtyId).Distinct().ToList();
+            dto.SpecialtyNames = specialties
+                .Select(ws => ws.Specialty.Name)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            dto.WorkingHours = user.WorkingHours.Adapt<List<WorkingHoursResponseDto>>();
         }
 
         return dto;
@@ -140,7 +220,9 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
-        return user.Adapt<UserProfileResponseDto>();
+        var profile = user.Adapt<UserProfileResponseDto>();
+        profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
+        return profile;
     }
 
     public async Task<UserProfileResponseDto?> UpdateUserProfileAsync(Guid userId, UserProfileUpdateRequestDto request)
@@ -155,7 +237,9 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         _unitOfWork.ApplicationUsers.Update(user);
         await _unitOfWork.CompleteAsync();
 
-        return user.Adapt<UserProfileResponseDto>();
+        var profile = user.Adapt<UserProfileResponseDto>();
+        profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
+        return profile;
     }
 
     public async Task<WorkerProfileResponseDto?> GetWorkerProfileAsync(Guid userId)
@@ -166,7 +250,9 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
-        return user.Adapt<WorkerProfileResponseDto>();
+        var profile = user.Adapt<WorkerProfileResponseDto>();
+        profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
+        return profile;
     }
 
     public async Task<WorkerPublicProfileResponseDto?> GetWorkerPublicProfileAsync(Guid workerId)
@@ -269,7 +355,13 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         await _unitOfWork.CompleteAsync();
 
         var refreshedUser = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
-        return refreshedUser?.Adapt<WorkerProfileResponseDto>();
+        var profile = refreshedUser?.Adapt<WorkerProfileResponseDto>();
+        if (profile != null)
+        {
+            profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(userId);
+        }
+
+        return profile;
     }
 
     public async Task<WorkerProfileResponseDto?> DeleteWorkerMainImageAsync(Guid userId, Guid mainImageId)
@@ -485,7 +577,9 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
-        return user.Adapt<AdminProfileResponseDto>();
+        var profile = user.Adapt<AdminProfileResponseDto>();
+        profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
+        return profile;
     }
 
     public async Task<AdminProfileResponseDto?> UpdateAdminProfileAsync(Guid userId, AdminProfileUpdateRequestDto request)
@@ -500,7 +594,9 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         _unitOfWork.ApplicationUsers.Update(user);
         await _unitOfWork.CompleteAsync();
 
-        return user.Adapt<AdminProfileResponseDto>();
+        var profile = user.Adapt<AdminProfileResponseDto>();
+        profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
+        return profile;
     }
 
     public async Task<SuperAdminProfileResponseDto?> GetSuperAdminProfileAsync(Guid userId)
@@ -511,7 +607,9 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
-        return user.Adapt<SuperAdminProfileResponseDto>();
+        var profile = user.Adapt<SuperAdminProfileResponseDto>();
+        profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
+        return profile;
     }
 
     public async Task<SuperAdminProfileResponseDto?> UpdateSuperAdminProfileAsync(Guid userId, SuperAdminProfileUpdateRequestDto request)
@@ -526,7 +624,9 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         _unitOfWork.ApplicationUsers.Update(user);
         await _unitOfWork.CompleteAsync();
 
-        return user.Adapt<SuperAdminProfileResponseDto>();
+        var profile = user.Adapt<SuperAdminProfileResponseDto>();
+        profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
+        return profile;
     }
 
     private async Task ApplyBaseProfileUpdatesAsync(ApplicationUser user, BaseProfileUpdateRequestDto request)
@@ -548,7 +648,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
         if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
         {
-            user.PhoneNumber = request.PhoneNumber;
+            await UpsertPrimaryPhoneNumberAsync(user.Id, request.PhoneNumber.Trim());
         }
 
         if (request.ProfileImage != null)
@@ -581,5 +681,45 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
     private Task<bool> IsInRoleAsync(ApplicationUser user, UserRole role)
         => _userManager.IsInRoleAsync(user, role.ToString());
+
+    private async Task<string?> GetPrimaryPhoneNumberAsync(Guid userId)
+    {
+        var phoneNumbers = await _unitOfWork.PhoneNumbers.FindAsync(p => p.UserId == userId);
+        return phoneNumbers
+            .OrderBy(p => p.CreatedAt)
+            .ThenBy(p => p.Number)
+            .Select(p => p.Number)
+            .FirstOrDefault();
+    }
+
+    private async Task UpsertPrimaryPhoneNumberAsync(Guid userId, string number)
+    {
+        var duplicates = await _unitOfWork.PhoneNumbers.FindAsync(p => p.Number == number && p.UserId != userId);
+        if (duplicates.Any())
+        {
+            throw new UserOperationException("Phone number already exists.");
+        }
+
+        var existingForUser = (await _unitOfWork.PhoneNumbers.FindAsync(p => p.UserId == userId))
+            .OrderBy(p => p.CreatedAt)
+            .ThenBy(p => p.Number)
+            .ToList();
+
+        if (existingForUser.Count == 0)
+        {
+            await _unitOfWork.PhoneNumbers.AddAsync(new PhoneNumber
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                Number = number,
+                CreatedAt = DateTime.UtcNow
+            });
+            return;
+        }
+
+        var primary = existingForUser[0];
+        primary.Number = number;
+        _unitOfWork.PhoneNumbers.Update(primary);
+    }
 
 }

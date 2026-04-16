@@ -23,18 +23,38 @@ public static class MapsterConfig
         TypeAdapterConfig<ApplicationUser, ApplicationUserResponseDto>
             .NewConfig()
             .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.PhoneNumber, _ => (string?)null)
+            .Map(dest => dest.PhoneNumbers, src => src.PhoneNumbers)
             .Map(dest => dest.Status, src => src.Status.ToString())
+            .Map(dest => dest.Role, _ => UserRole.User);
+
+        TypeAdapterConfig<ApplicationUser, AdminUserListResponseDto>
+            .NewConfig()
+            .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.Status, src => src.Status.ToString())
+            .Map(dest => dest.PrimaryPhoneNumber, _ => (string?)null)
+            .Map(dest => dest.PhoneNumbersCount, _ => 0)
+            .Map(dest => dest.Role, _ => UserRole.User);
+
+        TypeAdapterConfig<ApplicationUser, AdminUserDetailResponseDto>
+            .NewConfig()
+            .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.Status, src => src.Status.ToString())
+            .Map(dest => dest.PrimaryPhoneNumber, _ => (string?)null)
+            .Map(dest => dest.PhoneNumbers, src => src.PhoneNumbers)
             .Map(dest => dest.Role, _ => UserRole.User);
 
         TypeAdapterConfig<ApplicationUser, UserProfileResponseDto>
             .NewConfig()
             .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.PhoneNumber, _ => (string?)null)
             .Map(dest => dest.Role, _ => UserRole.User)
             .Map(dest => dest.Status, src => src.Status.ToString());
 
         TypeAdapterConfig<ApplicationUser, WorkerProfileResponseDto>
             .NewConfig()
             .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.PhoneNumber, _ => (string?)null)
             .Map(dest => dest.Role, _ => UserRole.Worker)
             .Map(dest => dest.Status, src => src.Status.ToString())
             .Map(dest => dest.SpecialtyIds,
@@ -58,12 +78,14 @@ public static class MapsterConfig
         TypeAdapterConfig<ApplicationUser, AdminProfileResponseDto>
             .NewConfig()
             .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.PhoneNumber, _ => (string?)null)
             .Map(dest => dest.Role, _ => UserRole.Admin)
             .Map(dest => dest.Status, src => src.Status.ToString());
 
         TypeAdapterConfig<ApplicationUser, SuperAdminProfileResponseDto>
             .NewConfig()
             .Map(dest => dest.Email, src => src.Email ?? string.Empty)
+            .Map(dest => dest.PhoneNumber, _ => (string?)null)
             .Map(dest => dest.Role, _ => UserRole.SuperAdmin)
             .Map(dest => dest.Status, src => src.Status.ToString());
 
@@ -81,6 +103,16 @@ public static class MapsterConfig
             .NewConfig();
 
         TypeAdapterConfig<WorkingHours, WorkingHoursResponseDto>
+            .NewConfig();
+
+        TypeAdapterConfig<PhoneNumberRequestDto, PhoneNumber>
+            .NewConfig()
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.UserId)
+            .Ignore(dest => dest.User)
+            .Ignore(dest => dest.CreatedAt);
+
+        TypeAdapterConfig<PhoneNumber, PhoneNumberResponseDto>
             .NewConfig();
 
         TypeAdapterConfig<BookingRequestDto, Booking>

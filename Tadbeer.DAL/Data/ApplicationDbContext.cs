@@ -101,11 +101,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.Property(x => x.Number).HasMaxLength(255).IsRequired();
             e.HasIndex(x => x.Number).IsUnique();
 
-            e.HasIndex(x => x.WorkerId);
+            e.Property(x => x.CreatedAt)
+                .HasColumnType("datetime2")
+                .HasDefaultValueSql("GETUTCDATE()");
 
-            e.HasOne(x => x.Worker)
+            e.HasIndex(x => x.UserId);
+
+            e.HasOne(x => x.User)
                 .WithMany(x => x.PhoneNumbers)
-                .HasForeignKey(x => x.WorkerId);
+                .HasForeignKey(x => x.UserId);
         });
 
         builder.Entity<WorkImage>(e =>
