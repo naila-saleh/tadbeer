@@ -89,4 +89,56 @@ public class ApplicationUserRepository : GenericRepository<ApplicationUser>, IAp
 
         return true;
     }
+
+    public async Task<IEnumerable<ApplicationUser>> SearchWorkersAsync(string? query, int page, int pageSize)
+    {
+        var workersQuery = BuildWorkersSearchQuery(query);
+
+        return await workersQuery
+            .OrderByDescending(u => u.AvgRating ?? 0)
+            .ThenBy(u => u.FirstName)
+            .ThenBy(u => u.LastName)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+    }
+
+    public async Task<int> CountWorkersAsync(string? query)
+    {
+        return await BuildWorkersSearchQuery(query).CountAsync();
+    }
+
+    private IQueryable<ApplicationUser> BuildWorkersSearchQuery(string? query)
+    {
+        var workerIdsQuery = _context.UserRoles
+            .Join(_context.Roles,
+                userRole => userRole.RoleId,
+                role => role.Id,
+                (userRole, role) => new { userRole.UserId, role.Name })
+            .Where(x => x.Name == UserRole.Worker.ToString())
+            .Select(x => x.UserId);
+
+        var workersQuery = _context.Users
+            .Include(u => u.WorkerSpecialties)
+            .ThenInclude(ws => ws.Specialty)
+            .Include(u => u.WorkingHours)
+            .Include(u => u.WorkImages)
+            .ThenInclude(wi => wi.SubImages)
+            .Where(u => workerIdsQuery.Contains(u.Id))
+            .Where(u => u.Status == UserStatus.Existed)
+            .AsNoTracking();
+
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            return workersQuery;
+        }
+
+        var pattern = $"%{query.Trim()}%";
+        return workersQuery.Where(u =>
+            EF.Functions.Like(u.FirstName, pattern) ||
+            EF.Functions.Like(u.LastName, pattern) ||
+            EF.Functions.Like(u.FirstName + " " + u.LastName, pattern) ||
+            EF.Functions.Like(u.City, pattern) ||
+            u.WorkerSpecialties.Any(ws => EF.Functions.Like(ws.Specialty.Name, pattern)));
+    }
 }

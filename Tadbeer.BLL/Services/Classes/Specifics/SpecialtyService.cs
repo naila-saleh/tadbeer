@@ -180,6 +180,15 @@ public class SpecialtyService : GenericService<SpecialtyRequestDto, SpecialtyRes
         await _unitOfWork.CompleteAsync();
     }
 
+    public async Task<IEnumerable<SpecialtyResponseDto>> SearchServicesAsync(string? query, int page, int pageSize)
+    {
+        var specialties = await _unitOfWork.Specialties.SearchServicesAsync(query, page, pageSize);
+        return specialties.Select(s => s.Adapt<SpecialtyResponseDto>()).ToList();
+    }
+
+    public Task<int> CountServicesAsync(string? query)
+        => _unitOfWork.Specialties.CountServicesAsync(query);
+
     private static bool CanDeleteIcon(string? iconPath)
         => !string.IsNullOrWhiteSpace(iconPath) &&
            !string.Equals(iconPath.Trim(), DefaultIconUrl, StringComparison.OrdinalIgnoreCase);

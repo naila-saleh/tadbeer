@@ -640,6 +640,15 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         return profile;
     }
 
+    public async Task<IEnumerable<WorkerPublicProfileResponseDto>> SearchWorkersAsync(string? query, int page, int pageSize)
+    {
+        var workers = await _unitOfWork.ApplicationUsers.SearchWorkersAsync(query, page, pageSize);
+        return workers.Adapt<List<WorkerPublicProfileResponseDto>>();
+    }
+
+    public Task<int> CountWorkersAsync(string? query)
+        => _unitOfWork.ApplicationUsers.CountWorkersAsync(query);
+
     private async Task ApplyBaseProfileUpdatesAsync(ApplicationUser user, BaseProfileUpdateRequestDto request)
     {
         if (!string.IsNullOrWhiteSpace(request.FirstName))
