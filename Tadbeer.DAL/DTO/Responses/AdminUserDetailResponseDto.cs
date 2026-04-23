@@ -10,6 +10,7 @@ public class AdminUserDetailResponseDto
 	public string Email { get; set; } = null!;
 	public string? PrimaryPhoneNumber { get; set; }
 	public ICollection<PhoneNumberResponseDto> PhoneNumbers { get; set; } = new List<PhoneNumberResponseDto>();
+	public DateOnly? DateOfBirth { get; set; }
 	public string City { get; set; } = null!;
 	public string ProfileImage { get; set; } = null!;
 	public UserRole Role { get; set; }
@@ -24,4 +25,3 @@ public class AdminUserDetailResponseDto
 	public DateTime CreatedAt { get; set; }
 	public DateTime UpdatedAt { get; set; }
 }
-

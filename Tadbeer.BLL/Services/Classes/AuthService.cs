@@ -47,6 +47,16 @@ public class AuthService : IAuthService
             };
         }
 
+        if (model.Role == UserRole.Worker && !model.DateOfBirth.HasValue)
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "Date of birth is required for Worker role.",
+                Errors = new[] { "DateOfBirth is required for Worker role." }
+            };
+        }
+
         var names = model.FullName.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         var firstName = names.Length > 0 ? names[0] : "";
         var lastName = names.Length > 1 ? names[1] : "";
@@ -59,6 +69,7 @@ public class AuthService : IAuthService
             LastName = lastName,
             City = "", // Setting default, could be added to DTO if needed
             ProfileImage = "",
+            DateOfBirth = model.DateOfBirth,
             Status = UserStatus.Existed,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow

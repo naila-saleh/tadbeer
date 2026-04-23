@@ -10,6 +10,8 @@ public class ApplicationUser : IdentityUser<Guid>
 
     public string ProfileImage { get; set; } = null!;
 
+    public DateOnly? DateOfBirth { get; set; }
+
     //public UserRole Role { get; set; } = UserRole.User;
     public UserStatus Status { get; set; } = UserStatus.Existed;
 

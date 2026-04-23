@@ -110,6 +110,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
                 Email = user.Email ?? string.Empty,
                 PrimaryPhoneNumber = primaryPhone,
                 PhoneNumbersCount = user.PhoneNumbers.Count,
+                DateOfBirth = user.DateOfBirth,
                 City = user.City,
                 ProfileImage = user.ProfileImage,
                 Role = role,
@@ -209,6 +210,11 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             throw new UserOperationException("Cannot change the role of a SuperAdmin user.");
         }
 
+        if (request.Role == UserRole.Worker && user != null && !user.DateOfBirth.HasValue)
+        {
+            throw new UserOperationException("Date of birth is required for Worker role.");
+        }
+
         return await _unitOfWork.ApplicationUsers.ChangeUserRoleAsync(userId, request.Role);
     }
 
@@ -275,6 +281,11 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         }
 
         await ApplyBaseProfileUpdatesAsync(user, request);
+
+        if (!user.DateOfBirth.HasValue)
+        {
+            throw new UserOperationException("Date of birth is required for Worker role.");
+        }
 
         if (!string.IsNullOrWhiteSpace(request.JobDescription))
         {
@@ -649,6 +660,11 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
         {
             await UpsertPrimaryPhoneNumberAsync(user.Id, request.PhoneNumber.Trim());
+        }
+
+        if (request.DateOfBirth.HasValue)
+        {
+            user.DateOfBirth = request.DateOfBirth.Value;
         }
 
         if (request.ProfileImage != null)

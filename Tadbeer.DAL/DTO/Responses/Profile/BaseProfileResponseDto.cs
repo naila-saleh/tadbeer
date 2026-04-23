@@ -9,8 +9,8 @@ public class BaseProfileResponseDto
     public string LastName { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
     public string City { get; set; } = null!;
     public string ProfileImage { get; set; } = null!;
     public UserRole Role { get; set; }
 }
-

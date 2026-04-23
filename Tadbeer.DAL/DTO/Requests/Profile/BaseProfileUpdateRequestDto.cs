@@ -17,6 +17,8 @@ public class BaseProfileUpdateRequestDto
     [Phone]
     public string? PhoneNumber { get; set; }
 
+    [DataType(DataType.Date)]
+    public DateOnly? DateOfBirth { get; set; }
+
     public IFormFile? ProfileImage { get; set; }
 }
-

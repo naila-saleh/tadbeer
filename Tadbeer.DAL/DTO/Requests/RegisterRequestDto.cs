@@ -15,6 +15,9 @@ public class RegisterRequestDto
 
     public string? PhoneNumber { get; set; }
 
+    [DataType(DataType.Date)]
+    public DateOnly? DateOfBirth { get; set; }
+
     [Required]
     [DataType(DataType.Password)]
     public string Password { get; set; } = null!;

@@ -10,6 +10,7 @@ public class ApplicationUserResponseDto
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
     public ICollection<PhoneNumberResponseDto> PhoneNumbers { get; set; } = new List<PhoneNumberResponseDto>();
+    public DateOnly? DateOfBirth { get; set; }
     public string City { get; set; } = null!;
     public string ProfileImage { get; set; } = null!;
 

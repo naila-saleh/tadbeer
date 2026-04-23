@@ -12,6 +12,8 @@ public class ApplicationUserRequestDto
     [Required, EmailAddress]
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
+    [DataType(DataType.Date)]
+    public DateOnly? DateOfBirth { get; set; }
     public string City { get; set; } = null!;
     
     // Optional password field (useful during creation)

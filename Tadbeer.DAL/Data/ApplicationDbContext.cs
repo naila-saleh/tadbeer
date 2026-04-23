@@ -44,6 +44,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.Property(x => x.LastName).HasMaxLength(255).IsRequired();
             e.Property(x => x.City).HasMaxLength(255).IsRequired();
             e.Property(x => x.ProfileImage).HasMaxLength(255).IsRequired();
+            e.Property(x => x.DateOfBirth).HasColumnType("date");
 
 
 
