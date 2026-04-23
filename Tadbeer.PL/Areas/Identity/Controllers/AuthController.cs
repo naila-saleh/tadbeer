@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Tadbeer.BLL.Services.Interfaces;
 using Tadbeer.DAL.DTO.Requests;
+using Tadbeer.DAL.DTO.Responses;
 
 namespace Tadbeer.PL.Areas.Identity.Controllers;
 
@@ -96,5 +99,36 @@ public class AuthController : ControllerBase
             return Ok(result);
         }
         return BadRequest(result);
+    }
+
+    [HttpPatch("change-password")]
+    [Authorize]
+    public async Task<ActionResult<AuthResponseDto>> ChangePassword([FromBody] ChangePasswordRequestDto model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (!TryGetCurrentUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _authService.ChangePasswordAsync(userId, model);
+        if (result.IsSuccess)
+        {
+            return Ok(result);
+        }
+
+        return string.Equals(result.Message, "Current password is incorrect.", StringComparison.OrdinalIgnoreCase)
+            ? Unauthorized(result)
+            : BadRequest(result);
+    }
+
+    private bool TryGetCurrentUserId(out Guid userId)
+    {
+        var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(userIdValue, out userId);
     }
 }

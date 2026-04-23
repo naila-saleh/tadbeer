@@ -307,4 +307,37 @@ public class AuthService : IAuthService
             Errors = result.Errors.Select(e => e.Description)
         };
     }
+
+    public async Task<AuthResponseDto> ChangePasswordAsync(Guid userId, ChangePasswordRequestDto model)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = false,
+                Message = "User not found."
+            };
+        }
+
+        var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+        if (result.Succeeded)
+        {
+            return new AuthResponseDto
+            {
+                IsSuccess = true,
+                Message = "Password changed successfully."
+            };
+        }
+
+        var errors = result.Errors.Select(e => e.Description).ToArray();
+        var isCurrentPasswordError = errors.Any(e => e.Contains("password", StringComparison.OrdinalIgnoreCase) && e.Contains("incorrect", StringComparison.OrdinalIgnoreCase));
+
+        return new AuthResponseDto
+        {
+            IsSuccess = false,
+            Message = isCurrentPasswordError ? "Current password is incorrect." : "Password change failed.",
+            Errors = errors
+        };
+    }
 }
