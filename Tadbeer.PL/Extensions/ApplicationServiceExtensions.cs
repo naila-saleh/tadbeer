@@ -37,7 +37,15 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IFileStorageService, FileStorageService>();
         
         services.AddScoped<BLL.Services.Interfaces.IAuthService, BLL.Services.Classes.AuthService>();
-        
+
+        // Named HttpClient for the external AI prediction endpoint
+        // Timeout is 5 min to handle Render cold-start (free tier sleeps between requests)
+        services.AddHttpClient("AIModel", c =>
+        {
+            c.BaseAddress = new Uri("https://projectai-drsx.onrender.com/");
+            c.Timeout = TimeSpan.FromMinutes(5);
+        });
+
         return services;
     }
 }

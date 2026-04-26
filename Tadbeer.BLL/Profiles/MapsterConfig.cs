@@ -160,5 +160,8 @@ public static class MapsterConfig
             .Map(dest => dest.WorkerId, src => src.Booking.WorkerId)
             .Map(dest => dest.UserName, src => $"{src.Booking.User.FirstName} {src.Booking.User.LastName}".Trim())
             .Map(dest => dest.WorkerName, src => $"{src.Booking.Worker.FirstName} {src.Booking.Worker.LastName}".Trim());
+
+        TypeAdapterConfig<AIDetection, AIDetectionResponseDto>
+            .NewConfig();
     }
 }
