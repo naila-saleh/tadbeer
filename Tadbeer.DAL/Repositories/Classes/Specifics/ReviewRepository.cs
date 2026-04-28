@@ -30,6 +30,14 @@ public class ReviewRepository : GenericRepository<Review>, IReviewRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Review>> GetAllByWorkerIdAsync(Guid workerId)
+    {
+        return await BuildDetailsQuery()
+            .Where(r => r.Booking.WorkerId == workerId)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync();
+    }
+
     public Task<int> CountByWorkerIdAsync(Guid workerId)
         => _context.Reviews.CountAsync(r => r.Booking.WorkerId == workerId);
 

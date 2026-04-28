@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Tadbeer.BLL.Services.Classes;
 using Tadbeer.BLL.Services.Classes.Specifics;
 using Tadbeer.BLL.Services.Interfaces;
@@ -36,7 +35,7 @@ public static class ApplicationServiceExtensions
         // Register file storage service
         services.AddScoped<IFileStorageService, FileStorageService>();
         
-        services.AddScoped<BLL.Services.Interfaces.IAuthService, BLL.Services.Classes.AuthService>();
+        services.AddScoped<IAuthService, AuthService>();
 
         // Named HttpClient for the external AI prediction endpoint
         // Timeout is 5 min to handle Render cold-start (free tier sleeps between requests)
@@ -45,6 +44,15 @@ public static class ApplicationServiceExtensions
             c.BaseAddress = new Uri("https://projectai-drsx.onrender.com/");
             c.Timeout = TimeSpan.FromMinutes(5);
         });
+
+        // Typed HttpClient for Nominatim reverse geocoding (OpenStreetMap)
+        services.AddHttpClient<IReverseGeocodingService, NominatimReverseGeocodingService>()
+            .ConfigureHttpClient(c =>
+            {
+                c.BaseAddress = new Uri("https://nominatim.openstreetmap.org");
+                c.DefaultRequestHeaders.Add("User-Agent", "Tadbeer-App/1.0");
+                c.Timeout = TimeSpan.FromSeconds(10);
+            });
 
         return services;
     }

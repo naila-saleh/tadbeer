@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
+using Tadbeer.DAL.DTO.Requests;
 using Tadbeer.DAL.DTO.Responses;
 using Tadbeer.DAL.Models;
 
@@ -20,10 +21,30 @@ public class WorkersController : ControllerBase
     }
 
     [HttpGet("")]
-    public async Task<ActionResult<IEnumerable<ApplicationUserResponseDto>>> GetWorkers()
+    public async Task<ActionResult<WorkersFilteredResponseDto>> GetWorkers([FromQuery] WorkerFiltersRequestDto request)
     {
-        var users = await _userService.GetAllAsync();
-        var workers = users.Where(u => u.Role == UserRole.Worker);
+        if ((request.SortByNearest || request.MaxDistanceKm.HasValue)
+            && (!request.Latitude.HasValue || !request.Longitude.HasValue))
+        {
+            return BadRequest("Latitude and longitude are required when using nearest or distance filters.");
+        }
+
+        // Model binding for decimals may fail in some client locales (comma vs dot).
+        // If MinRating was not bound, try to parse it manually from the raw query string.
+        if (!request.MinRating.HasValue && Request.Query.ContainsKey("minRating"))
+        {
+            var raw = Request.Query["minRating"].ToString();
+            if (!string.IsNullOrWhiteSpace(raw))
+            {
+                raw = raw.Replace(',', '.');
+                if (double.TryParse(raw, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out var parsed))
+                {
+                    request.MinRating = parsed;
+                }
+            }
+        }
+
+        var workers = await _userService.GetWorkersByFiltersAsync(request);
         return Ok(workers);
     }
 

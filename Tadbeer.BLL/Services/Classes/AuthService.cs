@@ -67,7 +67,8 @@ public class AuthService : IAuthService
             UserName = model.Email, // Identity requires UserName, we'll use Email
             FirstName = firstName,
             LastName = lastName,
-            City = "", // Setting default, could be added to DTO if needed
+            Latitude = null,
+            Longitude = null,
             ProfileImage = "",
             DateOfBirth = model.DateOfBirth,
             Status = UserStatus.Existed,

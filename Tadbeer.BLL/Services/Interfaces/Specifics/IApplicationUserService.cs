@@ -24,6 +24,7 @@ public interface IApplicationUserService : IGenericService<ApplicationUserReques
 
     Task<WorkerProfileResponseDto?> GetWorkerProfileAsync(Guid userId);
     Task<WorkerPublicProfileResponseDto?> GetWorkerPublicProfileAsync(Guid workerId);
+    Task<WorkersFilteredResponseDto> GetWorkersByFiltersAsync(WorkerFiltersRequestDto request);
     Task<IEnumerable<WorkerPublicProfileResponseDto>> SearchWorkersAsync(string? query, int page, int pageSize);
     Task<int> CountWorkersAsync(string? query);
     Task<WorkerProfileResponseDto?> UpdateWorkerProfileAsync(Guid userId, WorkerProfileUpdateRequestDto request);

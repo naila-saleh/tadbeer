@@ -4,7 +4,7 @@ public class WorkerProfileResponseDto : UserProfileResponseDto
 {
     public string? JobDescription { get; set; }
     public long? ExperienceYears { get; set; }
-    public long? AvgRating { get; set; }
+    public decimal? AvgRating { get; set; }
     public ICollection<Guid> SpecialtyIds { get; set; } = new List<Guid>();
     public ICollection<string> SpecialtyNames { get; set; } = new List<string>();
     public ICollection<WorkingHoursResponseDto> WorkingHours { get; set; } = new List<WorkingHoursResponseDto>();

@@ -10,7 +10,9 @@ public class BaseProfileResponseDto
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
     public DateOnly? DateOfBirth { get; set; }
-    public string City { get; set; } = null!;
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public string? City { get; set; }
     public string ProfileImage { get; set; } = null!;
     public UserRole Role { get; set; }
 }

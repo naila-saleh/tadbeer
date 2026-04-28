@@ -157,6 +157,18 @@ public class BookingService : GenericService<BookingRequestDto, BookingResponseD
             throw new UserOperationException("Only pending bookings can be accepted.");
         }
 
+        var hasAcceptedConflict = await _unitOfWork.Bookings.HasActiveBookingConflictAsync(
+            booking.WorkerId,
+            booking.BookingDate,
+            booking.StartTime,
+            booking.EndTime,
+            booking.Id);
+
+        if (hasAcceptedConflict)
+        {
+            throw new UserOperationException("Worker already has an accepted booking in this time range.");
+        }
+
         booking.Status = BookingStatus.Accepted;
         booking.UpdatedAt = DateTime.UtcNow;
         _unitOfWork.Bookings.Update(booking);

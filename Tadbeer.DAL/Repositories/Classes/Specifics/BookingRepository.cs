@@ -81,8 +81,7 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
             && b.BookingDate < dayEnd
             && b.StartTime < endTime
             && b.EndTime > startTime
-            && b.Status != BookingStatus.Cancelled
-            && b.Status != BookingStatus.Rejected
+            && b.Status == BookingStatus.Accepted
             && (!ignoreBookingId.HasValue || b.Id != ignoreBookingId.Value));
     }
 

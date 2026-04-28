@@ -6,7 +6,9 @@ public class ApplicationUser : IdentityUser<Guid>
 {
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
-    public string City { get; set; } = null!;
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public string? City { get; set; }
 
     public string ProfileImage { get; set; } = null!;
 
@@ -18,7 +20,7 @@ public class ApplicationUser : IdentityUser<Guid>
     // for worker
     public string? JobDescription { get; set; }
     public long? ExperienceYears { get; set; }
-    public long? AvgRating { get; set; }
+    public decimal? AvgRating { get; set; }
     
     public string? CodeResetPassword { get; set; }
     public DateTime? ExpirationCodeResetPassword { get; set; }

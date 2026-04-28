@@ -47,6 +47,7 @@ public class ReviewService : GenericService<ReviewRequestDto, ReviewResponseDto,
         await _unitOfWork.Reviews.AddAsync(review);
         await _unitOfWork.CompleteAsync();
 
+
         var created = await _unitOfWork.Reviews.GetByIdWithDetailsAsync(review.Id);
         return (created ?? review).Adapt<ReviewResponseDto>();
     }
@@ -71,6 +72,7 @@ public class ReviewService : GenericService<ReviewRequestDto, ReviewResponseDto,
         _unitOfWork.Reviews.Update(review);
         await _unitOfWork.CompleteAsync();
 
+
         var updated = await _unitOfWork.Reviews.GetByIdWithDetailsAsync(reviewId);
         return updated?.Adapt<ReviewResponseDto>();
     }
@@ -91,12 +93,14 @@ public class ReviewService : GenericService<ReviewRequestDto, ReviewResponseDto,
 
         _unitOfWork.Reviews.Remove(review);
         await _unitOfWork.CompleteAsync();
+
+
         return true;
     }
 
     public async Task<bool> DeleteAnyAsync(Guid reviewId)
     {
-        var review = await _unitOfWork.Reviews.GetByIdAsync(reviewId);
+        var review = await _unitOfWork.Reviews.GetByIdWithDetailsAsync(reviewId);
         if (review == null)
         {
             return false;
@@ -104,6 +108,8 @@ public class ReviewService : GenericService<ReviewRequestDto, ReviewResponseDto,
 
         _unitOfWork.Reviews.Remove(review);
         await _unitOfWork.CompleteAsync();
+
+
         return true;
     }
 
@@ -121,7 +127,7 @@ public class ReviewService : GenericService<ReviewRequestDto, ReviewResponseDto,
             PageSize = safePageSize
         };
     }
-
+    
     private static (int PageNumber, int PageSize, int Skip) NormalizePaging(int pageNumber, int pageSize)
     {
         var safePageNumber = pageNumber < 1 ? 1 : pageNumber;

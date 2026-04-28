@@ -1,4 +1,5 @@
 using Tadbeer.DAL.Models;
+using Tadbeer.DAL.DTO.Requests;
 
 namespace Tadbeer.DAL.Repositories.Interfaces.Specifics;
 
@@ -11,5 +12,6 @@ public interface IApplicationUserRepository : IGenericRepository<ApplicationUser
     Task<bool> IsBlockedAsync(Guid id);
     Task<IEnumerable<ApplicationUser>> SearchWorkersAsync(string? query, int page, int pageSize);
     Task<int> CountWorkersAsync(string? query);
+    Task<(IReadOnlyList<ApplicationUser> Workers, int TotalCount)> GetWorkersByFiltersAsync(WorkerFiltersRequestDto request);
     Task<bool> ChangeUserRoleAsync(Guid userId, UserRole newRole);
 }

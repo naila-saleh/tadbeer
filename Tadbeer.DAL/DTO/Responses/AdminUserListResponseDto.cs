@@ -11,7 +11,9 @@ public class AdminUserListResponseDto
     public string? PrimaryPhoneNumber { get; set; }
     public int PhoneNumbersCount { get; set; }
     public DateOnly? DateOfBirth { get; set; }
-    public string City { get; set; } = null!;
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+    public string? City { get; set; }
     public string ProfileImage { get; set; } = null!;
     public UserRole Role { get; set; }
     public string Status { get; set; } = null!;

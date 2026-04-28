@@ -42,9 +42,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         {
             e.Property(x => x.FirstName).HasMaxLength(255).IsRequired();
             e.Property(x => x.LastName).HasMaxLength(255).IsRequired();
-            e.Property(x => x.City).HasMaxLength(255).IsRequired();
+            e.Property(x => x.Latitude).HasColumnType("float");
+            e.Property(x => x.Longitude).HasColumnType("float");
+            e.Property(x => x.City).HasMaxLength(255);
             e.Property(x => x.ProfileImage).HasMaxLength(255).IsRequired();
             e.Property(x => x.DateOfBirth).HasColumnType("date");
+            e.Property(x => x.AvgRating).HasPrecision(3, 2);
 
 
 
@@ -55,7 +58,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
             e.HasIndex(x => x.Status);
             e.HasIndex(x => x.AvgRating);
-            e.HasIndex(x => x.City);
+            e.HasIndex(x => new { x.Latitude, x.Longitude });
 
 
             e.HasCheckConstraint(

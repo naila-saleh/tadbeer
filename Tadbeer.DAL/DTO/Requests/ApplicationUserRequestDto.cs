@@ -14,7 +14,11 @@ public class ApplicationUserRequestDto
     public string? PhoneNumber { get; set; }
     [DataType(DataType.Date)]
     public DateOnly? DateOfBirth { get; set; }
-    public string City { get; set; } = null!;
+    [Range(-90, 90)]
+    public double? Latitude { get; set; }
+
+    [Range(-180, 180)]
+    public double? Longitude { get; set; }
     
     // Optional password field (useful during creation)
     public string? Password { get; set; }

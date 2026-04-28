@@ -18,11 +18,13 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IReverseGeocodingService _reverseGeocodingService;
 
-    public ApplicationUserService(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IFileStorageService fileStorageService) : base(unitOfWork, unitOfWork.ApplicationUsers)
+    public ApplicationUserService(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IFileStorageService fileStorageService, IReverseGeocodingService reverseGeocodingService) : base(unitOfWork, unitOfWork.ApplicationUsers)
     {
         _userManager = userManager;
         _fileStorageService = fileStorageService;
+        _reverseGeocodingService = reverseGeocodingService;
     }
 
     public new async Task<IEnumerable<ApplicationUserResponseDto>> GetAllAsync()
@@ -111,7 +113,8 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
                 PrimaryPhoneNumber = primaryPhone,
                 PhoneNumbersCount = user.PhoneNumbers.Count,
                 DateOfBirth = user.DateOfBirth,
-                City = user.City,
+                Latitude = user.Latitude,
+                Longitude = user.Longitude,
                 ProfileImage = user.ProfileImage,
                 Role = role,
                 Status = user.Status.ToString(),
@@ -256,6 +259,11 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
+        // Attempt to resolve city if it's unknown or not set, and coordinates exist
+        await EnsureCityIsResolvedAsync(user);
+
+        user.AvgRating = await GetWorkerAverageRatingAsync(user.Id);
+
         var profile = user.Adapt<WorkerProfileResponseDto>();
         profile.PhoneNumber = await GetPrimaryPhoneNumberAsync(user.Id);
         return profile;
@@ -269,7 +277,56 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
+        // Attempt to resolve city if it's unknown or not set, and coordinates exist
+        await EnsureCityIsResolvedAsync(user);
+
+        user.AvgRating = await GetWorkerAverageRatingAsync(user.Id);
+
         return user.Adapt<WorkerPublicProfileResponseDto>();
+    }
+
+    public async Task<WorkersFilteredResponseDto> GetWorkersByFiltersAsync(WorkerFiltersRequestDto request)
+    {
+        var safePage = request.Page < 1 ? 1 : request.Page;
+        var safePageSize = request.PageSize is < 1 or > 50 ? 10 : request.PageSize;
+
+        request.Page = safePage;
+        request.PageSize = safePageSize;
+
+        var (workers, totalCount) = await _unitOfWork.ApplicationUsers.GetWorkersByFiltersAsync(request);
+        var workerDtos = workers.Adapt<List<WorkerPublicProfileResponseDto>>();
+
+        for (var i = 0; i < workers.Count; i++)
+        {
+            workerDtos[i].AvgRating = await GetWorkerAverageRatingAsync(workers[i].Id);
+        }
+
+
+        if ((request.SortByNearest || request.MaxDistanceKm.HasValue)
+            && request.Latitude.HasValue
+            && request.Longitude.HasValue)
+        {
+            for (var i = 0; i < workerDtos.Count; i++)
+            {
+                var worker = workers[i];
+                if (worker.Latitude.HasValue && worker.Longitude.HasValue)
+                {
+                    workerDtos[i].DistanceKm = CalculateDistanceKm(
+                        request.Latitude.Value,
+                        request.Longitude.Value,
+                        worker.Latitude.Value,
+                        worker.Longitude.Value);
+                }
+            }
+        }
+
+        return new WorkersFilteredResponseDto
+        {
+            Page = safePage,
+            PageSize = safePageSize,
+            TotalCount = totalCount,
+            Workers = workerDtos
+        };
     }
 
     public async Task<WorkerProfileResponseDto?> UpdateWorkerProfileAsync(Guid userId, WorkerProfileUpdateRequestDto request)
@@ -642,8 +699,15 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
     public async Task<IEnumerable<WorkerPublicProfileResponseDto>> SearchWorkersAsync(string? query, int page, int pageSize)
     {
-        var workers = await _unitOfWork.ApplicationUsers.SearchWorkersAsync(query, page, pageSize);
-        return workers.Adapt<List<WorkerPublicProfileResponseDto>>();
+        var workers = (await _unitOfWork.ApplicationUsers.SearchWorkersAsync(query, page, pageSize)).ToList();
+        var dtos = workers.Adapt<List<WorkerPublicProfileResponseDto>>();
+
+        for (var i = 0; i < workers.Count; i++)
+        {
+            dtos[i].AvgRating = await GetWorkerAverageRatingAsync(workers[i].Id);
+        }
+
+        return dtos;
     }
 
     public Task<int> CountWorkersAsync(string? query)
@@ -661,9 +725,29 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             user.LastName = request.LastName;
         }
 
-        if (!string.IsNullOrWhiteSpace(request.City))
+        if (request.Latitude.HasValue)
         {
-            user.City = request.City;
+            user.Latitude = request.Latitude.Value;
+        }
+
+        if (request.Longitude.HasValue)
+        {
+            user.Longitude = request.Longitude.Value;
+        }
+
+        // If both coordinates are now set, reverse geocode the city
+        if (user.Latitude.HasValue && user.Longitude.HasValue)
+        {
+            var city = await _reverseGeocodingService.GetPlaceNameAsync(user.Latitude.Value, user.Longitude.Value);
+            if (!string.IsNullOrWhiteSpace(city))
+            {
+                user.City = city;
+            }
+            else if (string.IsNullOrWhiteSpace(user.City))
+            {
+                // Keep a visible fallback instead of leaving the city blank when geocoding fails.
+                user.City = "Unknown";
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
@@ -746,5 +830,59 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         primary.Number = number;
         _unitOfWork.PhoneNumbers.Update(primary);
     }
+
+    private async Task<decimal?> GetWorkerAverageRatingAsync(Guid workerId)
+    {
+        var reviews = await _unitOfWork.Reviews.GetAllByWorkerIdAsync(workerId);
+        var list = reviews.ToList();
+
+        if (!list.Any())
+        {
+            return null;
+        }
+
+        return list.Average(r => (decimal)r.Rate);
+    }
+
+    private async Task EnsureCityIsResolvedAsync(ApplicationUser user)
+    {
+        // Only attempt geocoding if:
+        // 1. City is empty/unknown AND
+        // 2. Both coordinates are available
+        if ((string.IsNullOrWhiteSpace(user.City) || user.City == "Unknown") &&
+            user.Latitude.HasValue && user.Longitude.HasValue)
+        {
+            try
+            {
+                var city = await _reverseGeocodingService.GetPlaceNameAsync(user.Latitude.Value, user.Longitude.Value);
+                if (!string.IsNullOrWhiteSpace(city))
+                {
+                    user.City = city;
+                    // Save the resolved city back to the database
+                    _unitOfWork.ApplicationUsers.Update(user);
+                    await _unitOfWork.CompleteAsync();
+                }
+            }
+            catch
+            {
+                // Silently fail - we'll just return the user as-is if geocoding fails
+            }
+        }
+    }
+
+    private static double CalculateDistanceKm(double fromLat, double fromLng, double toLat, double toLng)
+    {
+        const double earthRadiusKm = 6371.0;
+        var dLat = DegreesToRadians(toLat - fromLat);
+        var dLng = DegreesToRadians(toLng - fromLng);
+        var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2)
+                + Math.Cos(DegreesToRadians(fromLat)) * Math.Cos(DegreesToRadians(toLat))
+                * Math.Sin(dLng / 2) * Math.Sin(dLng / 2);
+        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        return earthRadiusKm * c;
+    }
+
+    private static double DegreesToRadians(double value)
+        => value * (Math.PI / 180);
 
 }
