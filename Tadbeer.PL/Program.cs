@@ -12,10 +12,7 @@ using Tadbeer.PL.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<Tadbeer.PL.Filters.GlobalExceptionFilter>();
-}).AddJsonOptions(options =>
+builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
@@ -152,6 +149,7 @@ app.UseCors(userPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<Tadbeer.PL.Middlewares.GlobalExceptionMiddleware>();
 app.UseMiddleware<Tadbeer.PL.Middlewares.CheckUserStatusMiddleware>();
 
 app.UseStaticFiles();

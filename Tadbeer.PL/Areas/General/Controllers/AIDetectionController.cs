@@ -12,10 +12,12 @@ namespace Tadbeer.PL.Areas.General.Controllers;
 public class AIDetectionController : ControllerBase
 {
     private readonly IAIDetectionService _aiDetectionService;
+    private readonly IApplicationUserService _userService;
 
-    public AIDetectionController(IAIDetectionService aiDetectionService)
+    public AIDetectionController(IAIDetectionService aiDetectionService, IApplicationUserService userService)
     {
         _aiDetectionService = aiDetectionService;
+        _userService = userService;
     }
 
     /// <summary>
@@ -31,6 +33,23 @@ public class AIDetectionController : ControllerBase
             return BadRequest("يرجى إرسال صورة صالحة.");
 
         var result = await _aiDetectionService.PredictAsync(request.Image);
+        
+        if (request.Latitude.HasValue && request.Longitude.HasValue && result.MatchedSpecialties.Any())
+        {
+            var filter = new WorkerFiltersRequestDto
+            {
+                Latitude = request.Latitude,
+                Longitude = request.Longitude,
+                MaxDistanceKm = request.MaxDistanceKm,
+                SortByNearest = true,
+                PageSize = 5,
+                Query = result.MatchedSpecialties.First().Name
+            };
+            
+            var workersFilteredResponse = await _userService.GetWorkersByFiltersAsync(filter);
+            result.SuggestedWorkers = workersFilteredResponse.Workers;
+        }
+
         return Ok(result);
     }
 }

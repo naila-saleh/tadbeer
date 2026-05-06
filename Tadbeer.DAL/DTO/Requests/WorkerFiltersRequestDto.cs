@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Tadbeer.DAL.DTO.Requests;
 
@@ -26,5 +26,7 @@ public class WorkerFiltersRequestDto
 
     [Range(1, 50)]
     public int PageSize { get; set; } = 10;
+
+    public string? Query { get; set; }
 }
 

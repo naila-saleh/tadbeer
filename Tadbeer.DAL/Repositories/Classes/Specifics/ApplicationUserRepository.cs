@@ -111,7 +111,7 @@ public class ApplicationUserRepository : GenericRepository<ApplicationUser>, IAp
 
     public async Task<(IReadOnlyList<ApplicationUser> Workers, int TotalCount)> GetWorkersByFiltersAsync(WorkerFiltersRequestDto request)
     {
-        var workersQuery = BuildWorkersSearchQuery(null)
+        var workersQuery = BuildWorkersSearchQuery(request.Query)
             .Include(u => u.WorkerBookings.Where(b => b.Status == BookingStatus.Accepted));
 
         // Materialize immediately to avoid IQueryable type chain issues
