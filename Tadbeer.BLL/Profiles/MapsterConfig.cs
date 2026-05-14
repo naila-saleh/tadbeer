@@ -92,6 +92,15 @@ public static class MapsterConfig
         TypeAdapterConfig<WorkImage, WorkImageCreatedResponseDto>
             .NewConfig();
 
+        TypeAdapterConfig<WorkImage, WorkImageResponseDto>
+            .NewConfig();
+
+        TypeAdapterConfig<WorkImage, WorkerWorkImageResponseDto>
+            .NewConfig();
+
+        TypeAdapterConfig<WorkImage, WorkerPublicWorkImageResponseDto>
+            .NewConfig();
+
         TypeAdapterConfig<Specialty, SpecialtyResponseDto>
             .NewConfig()
             .Map(dest => dest.IconUrl,

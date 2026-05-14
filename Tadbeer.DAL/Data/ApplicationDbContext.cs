@@ -119,6 +119,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<WorkImage>(e =>
         {
             e.Property(x => x.ImageUrl).HasMaxLength(255).IsRequired();
+            e.Property(x => x.Name).HasMaxLength(255).IsRequired();
+            e.Property(x => x.Description).HasMaxLength(1000);
 
             e.HasIndex(x => x.WorkerId);
 

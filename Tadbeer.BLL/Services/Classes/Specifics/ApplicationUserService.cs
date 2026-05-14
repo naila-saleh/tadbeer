@@ -565,7 +565,7 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         return refreshedUser?.Adapt<WorkerProfileResponseDto>();
     }
 
-    public async Task<IEnumerable<WorkImageCreatedResponseDto>?> CreateWorkerWorkImagesAsync(Guid userId, CreateWorkImagesRequestDto request)
+    public async Task<WorkImageCreatedResponseDto?> CreateWorkerWorkImagesAsync(Guid userId, CreateWorkImagesRequestDto request)
     {
         var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(userId);
         if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
@@ -573,45 +573,49 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
             return null;
         }
 
-        if (request.MainImageFiles == null || request.MainImageFiles.Count == 0)
+        if (request.ImageFile == null)
         {
-            throw new UserOperationException("At least one image file is required.");
+            throw new UserOperationException("Image file is required.");
         }
+
+        var name = request.Name.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new UserOperationException("Name is required.");
+        }
+
+        var description = request.Description?.Trim();
 
         var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-        var createdImages = new List<WorkImageCreatedResponseDto>();
         var now = DateTime.UtcNow;
 
-        foreach (var file in request.MainImageFiles)
+        if (!_fileStorageService.ValidateFile(request.ImageFile, allowedExtensions, 10 * 1024 * 1024))
         {
-            if (!_fileStorageService.ValidateFile(file, allowedExtensions, 10 * 1024 * 1024))
-            {
-                throw new UserOperationException("Invalid image file. Allowed: jpg, jpeg, png, gif. Max size: 10MB.");
-            }
-
-            var mainImageId = Guid.NewGuid();
-            var mainImageUrl = await _fileStorageService.SaveFileAsync(file, "work-images", user.Id);
-
-            var newMainImage = new WorkImage
-            {
-                Id = mainImageId,
-                WorkerId = user.Id,
-                ImageUrl = mainImageUrl,
-                CreatedAt = now,
-                UpdatedAt = now,
-                SubImages = new List<WorkSubImage>()
-            };
-
-            await _unitOfWork.WorkImages.AddAsync(newMainImage);
-
-            createdImages.Add(newMainImage.Adapt<WorkImageCreatedResponseDto>());
+            throw new UserOperationException("Invalid image file. Allowed: jpg, jpeg, png, gif. Max size: 10MB.");
         }
+
+        var mainImageId = Guid.NewGuid();
+        var mainImageUrl = await _fileStorageService.SaveFileAsync(request.ImageFile, "work-images", user.Id);
+
+        var newMainImage = new WorkImage
+        {
+            Id = mainImageId,
+            WorkerId = user.Id,
+            ImageUrl = mainImageUrl,
+            Name = name,
+            Description = string.IsNullOrWhiteSpace(description) ? null : description,
+            CreatedAt = now,
+            UpdatedAt = now,
+            SubImages = new List<WorkSubImage>()
+        };
+
+        await _unitOfWork.WorkImages.AddAsync(newMainImage);
 
         user.UpdatedAt = now;
         _unitOfWork.ApplicationUsers.Update(user);
         await _unitOfWork.CompleteAsync();
 
-        return createdImages;
+        return newMainImage.Adapt<WorkImageCreatedResponseDto>();
     }
 
     public async Task<string?> ToggleUserOrWorkerStatusAsync(Guid userId)

@@ -33,7 +33,7 @@ public interface IApplicationUserService : IGenericService<ApplicationUserReques
     Task<IEnumerable<WorkerWorkImageResponseDto>?> GetWorkerMainImagesAsync(Guid userId);
     Task<IEnumerable<WorkerWorkSubImageResponseDto>?> GetWorkerSubImagesAsync(Guid userId, Guid mainImageId);
     Task<WorkerProfileResponseDto?> AddWorkerSubImagesToMainImageAsync(Guid userId, Guid mainImageId, WorkerMainImageSubImagesRequestDto request);
-    Task<IEnumerable<WorkImageCreatedResponseDto>?> CreateWorkerWorkImagesAsync(Guid userId, CreateWorkImagesRequestDto request);
+    Task<WorkImageCreatedResponseDto?> CreateWorkerWorkImagesAsync(Guid userId, CreateWorkImagesRequestDto request);
 
     Task<string?> ToggleUserOrWorkerStatusAsync(Guid userId);
 

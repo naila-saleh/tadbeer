@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Security.Claims;
@@ -66,16 +65,18 @@ public class ProfileController : ControllerBase
 
     [HttpPost("me/work-images")]
     [Consumes("multipart/form-data")]
-    public async Task<ActionResult<IEnumerable<WorkImageCreatedResponseDto>>> CreateWorkImages([FromForm] CreateWorkImagesRequestDto request)
+    public async Task<ActionResult<WorkImageCreatedResponseDto>> CreateWorkImages([FromForm] CreateWorkImagesRequestDto request)
     {
         if (!TryGetCurrentUserId(out var userId))
         {
             return Unauthorized();
         }
 
-        request.MainImageFiles = request.MainImageFiles?.Count > 0
-            ? request.MainImageFiles
-            : CollectFiles("ImageFiles");
+        if (request.ImageFile == null)
+        {
+            request.ImageFile = CollectFiles("ImageFile").FirstOrDefault()
+                ?? CollectFiles("ImageFiles").FirstOrDefault();
+        }
 
         var createdImages = await _userService.CreateWorkerWorkImagesAsync(userId, request);
         if (createdImages == null)
@@ -95,7 +96,7 @@ public class ProfileController : ControllerBase
             return Unauthorized();
         }
 
-        request.SubImageFiles = request.SubImageFiles?.Count > 0
+        request.SubImageFiles = request.SubImageFiles.Count > 0
             ? request.SubImageFiles
             : CollectFiles("SubImageFiles");
 
@@ -210,7 +211,7 @@ public class ProfileController : ControllerBase
         // Fallback to all posted files if client omits field names.
         return files.Count > 0 ? files : Request.Form.Files.ToList();
     }
-
+    
     private void HydrateComplexWorkerFieldsFromForm(WorkerProfileUpdateRequestDto request)
     {
         if (!Request.HasFormContentType)

@@ -4,6 +4,8 @@ public class WorkImage
 {
     public Guid Id { get; set; }
     public string ImageUrl { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
 
     public Guid WorkerId { get; set; }
     public ApplicationUser Worker { get; set; } = null!;

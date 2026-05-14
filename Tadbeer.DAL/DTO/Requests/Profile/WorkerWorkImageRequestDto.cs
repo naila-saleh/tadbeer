@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+﻿using Tadbeer.DAL.DTO.Requests.WorkImages;
 
 namespace Tadbeer.DAL.DTO.Requests.Profile;
 
-public class WorkerWorkImageRequestDto
+// Legacy compatibility alias. Prefer CreateWorkImagesRequestDto for new code.
+public class WorkerWorkImageRequestDto : CreateWorkImagesRequestDto
 {
-    [Required]
-    public IFormFile ImageFile { get; set; } = null!;
-
     public ICollection<WorkerWorkSubImageRequestDto> SubImages { get; set; } = new List<WorkerWorkSubImageRequestDto>();
 }
 
