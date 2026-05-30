@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Tadbeer.BLL.Services.Interfaces.Specifics;
 using Tadbeer.DAL.DTO.Requests;
+using Tadbeer.DAL.DTO.Requests.Profile;
 using Tadbeer.DAL.DTO.Responses;
+using Tadbeer.DAL.DTO.Responses.Profile;
 using Tadbeer.DAL.Models;
 
 namespace Tadbeer.PL.Areas.Admin.Controllers;
@@ -38,6 +39,25 @@ public class UsersController : ControllerBase
             return NotFound();
         }
         return Ok(user);
+    }
+
+    [HttpGet("{id}/identity-verification")]
+    public async Task<ActionResult<AdminUserIdentityVerificationResponseDto>> GetIdentityVerification(Guid id)
+    {
+        var user = await _userService.GetAdminUserIdentityVerificationAsync(id);
+        if (user == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(user);
+    }
+
+    [HttpGet("identity-verification/pending")]
+    public async Task<ActionResult<IEnumerable<AdminUserIdentityVerificationResponseDto>>> GetPendingIdentityVerifications()
+    {
+        var users = await _userService.GetPendingWorkerIdentityVerificationsAsync();
+        return Ok(users);
     }
     
     [HttpDelete("{id}")]
@@ -77,5 +97,29 @@ public class UsersController : ControllerBase
         var result = await _userService.ChangeUserRoleAsync(id, request);
         if (!result) return BadRequest(new { message = "Operation failed. Make sure the provided role is valid." });
         return Ok(new { message = "User role updated successfully." });
+    }
+
+    [HttpPost("{id}/identity-verification/approve")]
+    public async Task<ActionResult<WorkerIdentityVerificationStatusResponseDto>> ApproveWorkerIdentity(Guid id)
+    {
+        var result = await _userService.ApproveWorkerIdentityImageAsync(id);
+        if (result == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPost("{id}/identity-verification/reject")]
+    public async Task<ActionResult<WorkerIdentityVerificationStatusResponseDto>> RejectWorkerIdentity(Guid id, [FromBody] AdminRejectWorkerIdentityRequestDto request)
+    {
+        var result = await _userService.RejectWorkerIdentityImageAsync(id, request);
+        if (result == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
     }
 }

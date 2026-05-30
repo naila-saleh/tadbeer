@@ -11,6 +11,9 @@ public class BookingResponseDto
 	public Guid WorkerId { get; set; }
 	public string WorkerName { get; set; } = string.Empty;
 
+	public Guid? SpecialtyId { get; set; }
+	public string? SpecialtyName { get; set; }
+
 	public Guid WorkingHourId { get; set; }
 	public WeekDay? WorkingDay { get; set; }
 	public TimeOnly? WorkingHourStart { get; set; }

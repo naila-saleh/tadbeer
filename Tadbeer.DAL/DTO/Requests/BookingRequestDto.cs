@@ -8,6 +8,9 @@ public class BookingRequestDto
 	public Guid WorkerId { get; set; }
 
 	[Required]
+	public Guid SpecialtyId { get; set; }
+
+	[Required]
 	public DateTime BookingDate { get; set; }
 
 	[Required]

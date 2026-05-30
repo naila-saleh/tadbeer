@@ -10,6 +10,11 @@ public class Booking
     public Guid WorkerId { get; set; }
     public ApplicationUser Worker { get; set; } = null!;
 
+    // The specialty/work type this booking is for. Nullable to avoid breaking existing rows;
+    // new bookings should provide this value.
+    public Guid? SpecialtyId { get; set; }
+    public Specialty? Specialty { get; set; }
+
     public DateTime BookingDate { get; set; }
     public TimeOnly StartTime { get; set; }
     public TimeOnly EndTime { get; set; }

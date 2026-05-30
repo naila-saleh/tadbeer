@@ -48,6 +48,8 @@ public class ReviewRepository : GenericRepository<Review>, IReviewRepository
             .ThenInclude(b => b.User)
             .Include(r => r.Booking)
             .ThenInclude(b => b.Worker)
+            .Include(r => r.Booking)
+            .ThenInclude(b => b.Specialty)
             .AsNoTracking();
     }
 }

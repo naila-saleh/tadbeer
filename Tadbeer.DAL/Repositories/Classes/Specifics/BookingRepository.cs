@@ -90,6 +90,7 @@ public class BookingRepository : GenericRepository<Booking>, IBookingRepository
         return _context.Bookings
             .Include(b => b.User)
             .Include(b => b.Worker)
+            .Include(b => b.Specialty)
             .Include(b => b.WorkingHour)
             .AsNoTracking();
     }

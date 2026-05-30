@@ -21,6 +21,8 @@ public class AdminUserDetailResponseDto
 	public string? JobDescription { get; set; }
 	public long? ExperienceYears { get; set; }
 	public decimal? AvgRating { get; set; }
+	public string? IdentityImageUrl { get; set; }
+	public bool IsIdentityVerified { get; set; }
 	public ICollection<Guid>? SpecialtyIds { get; set; } = new List<Guid>();
 	public ICollection<string>? SpecialtyNames { get; set; } = new List<string>();
 	public ICollection<WorkingHoursResponseDto>? WorkingHours { get; set; } = new List<WorkingHoursResponseDto>();

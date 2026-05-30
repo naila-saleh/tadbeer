@@ -109,6 +109,27 @@ public class ApplicationUserRepository : GenericRepository<ApplicationUser>, IAp
         return await BuildWorkersSearchQuery(query).CountAsync();
     }
 
+    public async Task<IEnumerable<ApplicationUser>> GetPendingIdentityVerificationWorkersAsync()
+    {
+        var workerIdsQuery = _context.UserRoles
+            .Join(_context.Roles,
+                userRole => userRole.RoleId,
+                role => role.Id,
+                (userRole, role) => new { userRole.UserId, role.Name })
+            .Where(x => x.Name == UserRole.Worker.ToString())
+            .Select(x => x.UserId);
+
+        return await _context.Users
+            .AsNoTracking()
+            .Where(u => workerIdsQuery.Contains(u.Id))
+            .Where(u => u.IdentityImageUrl != null)
+            .Where(u => !u.IsIdentityVerified)
+            .Where(u => u.IdentityImageRejectionReason == null)
+            .OrderBy(u => u.FirstName)
+            .ThenBy(u => u.LastName)
+            .ToListAsync();
+    }
+
     public async Task<(IReadOnlyList<ApplicationUser> Workers, int TotalCount)> GetWorkersByFiltersAsync(WorkerFiltersRequestDto request)
     {
         var workersQuery = BuildWorkersSearchQuery(request.Query)

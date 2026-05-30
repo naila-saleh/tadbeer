@@ -10,6 +10,7 @@ public class WorkerPublicProfileResponseDto
 	public string? City { get; set; }
 	public double? DistanceKm { get; set; }
 	public string ProfileImage { get; set; } = null!;
+	public bool IsIdentityVerified { get; set; }
 	public string? JobDescription { get; set; }
 	public long? ExperienceYears { get; set; }
 	public decimal? AvgRating { get; set; }

@@ -24,6 +24,8 @@ public interface IApplicationUserService : IGenericService<ApplicationUserReques
 
     Task<WorkerProfileResponseDto?> GetWorkerProfileAsync(Guid userId);
     Task<WorkerPublicProfileResponseDto?> GetWorkerPublicProfileAsync(Guid workerId);
+    Task<AdminUserIdentityVerificationResponseDto?> GetAdminUserIdentityVerificationAsync(Guid id);
+    Task<IEnumerable<AdminUserIdentityVerificationResponseDto>> GetPendingWorkerIdentityVerificationsAsync();
     Task<WorkersFilteredResponseDto> GetWorkersByFiltersAsync(WorkerFiltersRequestDto request);
     Task<IEnumerable<WorkerPublicProfileResponseDto>> SearchWorkersAsync(string? query, int page, int pageSize);
     Task<int> CountWorkersAsync(string? query);
@@ -34,6 +36,10 @@ public interface IApplicationUserService : IGenericService<ApplicationUserReques
     Task<IEnumerable<WorkerWorkSubImageResponseDto>?> GetWorkerSubImagesAsync(Guid userId, Guid mainImageId);
     Task<WorkerProfileResponseDto?> AddWorkerSubImagesToMainImageAsync(Guid userId, Guid mainImageId, WorkerMainImageSubImagesRequestDto request);
     Task<WorkImageCreatedResponseDto?> CreateWorkerWorkImagesAsync(Guid userId, CreateWorkImagesRequestDto request);
+    Task<WorkerIdentityVerificationStatusResponseDto?> UploadWorkerIdentityImageAsync(Guid userId, WorkerIdentityImageUploadRequestDto request);
+    Task<WorkerIdentityVerificationStatusResponseDto?> GetWorkerIdentityVerificationStatusAsync(Guid userId);
+    Task<WorkerIdentityVerificationStatusResponseDto?> ApproveWorkerIdentityImageAsync(Guid workerId);
+    Task<WorkerIdentityVerificationStatusResponseDto?> RejectWorkerIdentityImageAsync(Guid workerId, AdminRejectWorkerIdentityRequestDto request);
 
     Task<string?> ToggleUserOrWorkerStatusAsync(Guid userId);
 

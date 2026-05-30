@@ -11,6 +11,9 @@ public class ApplicationUser : IdentityUser<Guid>
     public string? City { get; set; }
 
     public string ProfileImage { get; set; } = null!;
+    public string? IdentityImageUrl { get; set; }
+    public bool IsIdentityVerified { get; set; }
+    public string? IdentityImageRejectionReason { get; set; }
 
     public DateOnly? DateOfBirth { get; set; }
 

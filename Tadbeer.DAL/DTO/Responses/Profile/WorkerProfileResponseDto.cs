@@ -2,6 +2,8 @@
 
 public class WorkerProfileResponseDto : UserProfileResponseDto
 {
+    public string? IdentityImageUrl { get; set; }
+    public bool IsIdentityVerified { get; set; }
     public string? JobDescription { get; set; }
     public long? ExperienceYears { get; set; }
     public decimal? AvgRating { get; set; }

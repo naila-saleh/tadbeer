@@ -46,6 +46,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.Property(x => x.Longitude).HasColumnType("float");
             e.Property(x => x.City).HasMaxLength(255);
             e.Property(x => x.ProfileImage).HasMaxLength(255).IsRequired();
+            e.Property(x => x.IdentityImageUrl).HasMaxLength(255);
+            e.Property(x => x.IsIdentityVerified).HasDefaultValue(false);
+            e.Property(x => x.IdentityImageRejectionReason).HasMaxLength(1000);
             e.Property(x => x.DateOfBirth).HasColumnType("date");
             e.Property(x => x.AvgRating).HasPrecision(3, 2);
 
@@ -57,14 +60,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 .HasDefaultValue(UserStatus.Existed);
 
             e.HasIndex(x => x.Status);
+            e.HasIndex(x => x.IsIdentityVerified);
             e.HasIndex(x => x.AvgRating);
             e.HasIndex(x => new { x.Latitude, x.Longitude });
 
 
-            e.HasCheckConstraint(
+            e.ToTable(tb => tb.HasCheckConstraint(
                 "CK_ApplicationUser_Status",
                 "[Status] IN ('Existed','Deleted')"
-            );
+            ));
         });
 
         builder.Entity<Specialty>(e =>
@@ -73,15 +77,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.Property(x => x.Description).HasMaxLength(1000).IsRequired();
             e.Property(x => x.Icon).HasMaxLength(255).IsRequired();
 
-            e.HasCheckConstraint(
+            e.ToTable(tb => tb.HasCheckConstraint(
                 "CK_Specialty_Description_NotEmpty",
                 "LEN(LTRIM(RTRIM([Description]))) > 0"
-            );
+            ));
 
-            e.HasCheckConstraint(
+            e.ToTable(tb => tb.HasCheckConstraint(
                 "CK_Specialty_Icon_NotEmpty",
                 "LEN(LTRIM(RTRIM([Icon]))) > 0"
-            );
+            ));
         });
         builder.Entity<Specialty>().HasIndex(x => x.Name).IsUnique();
 
@@ -151,10 +155,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 .WithMany(x => x.WorkingHours)
                 .HasForeignKey(x => x.WorkerId);
 
-            e.HasCheckConstraint(
+            e.ToTable(tb => tb.HasCheckConstraint(
                 "CK_WorkingHours_DayOfWeek",
                 "[DayOfWeek] IN ('Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday')"
-            );
+            ));
         });
 
         builder.Entity<Booking>(e =>
@@ -171,18 +175,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                 .HasDefaultValue(BookingStatus.Pending);
 
             e.HasIndex(x => x.WorkerId);
+            e.HasIndex(x => x.SpecialtyId);
             e.HasIndex(x => x.UserId);
             e.HasIndex(x => x.Status);
 
-            e.HasCheckConstraint(
+            e.ToTable(tb => tb.HasCheckConstraint(
                 "CK_Bookings_Status",
                 "[Status] IN ('Pending','Accepted','Rejected','Completed','Cancelled')"
-            );
+            ));
 
-            e.HasCheckConstraint(
+            e.ToTable(tb => tb.HasCheckConstraint(
                 "CK_Bookings_TimeRange",
                 "[StartTime] < [EndTime]"
-            );
+            ));
 
             e.HasOne(x => x.User)
                 .WithMany(x => x.UserBookings)
@@ -192,6 +197,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             e.HasOne(x => x.Worker)
                 .WithMany(x => x.WorkerBookings)
                 .HasForeignKey(x => x.WorkerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            e.HasOne(x => x.Specialty)
+                .WithMany()
+                .HasForeignKey(x => x.SpecialtyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             e.HasOne(x => x.WorkingHour)
@@ -205,7 +215,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
             e.Property(x => x.Rate).IsRequired();
 
-            e.HasCheckConstraint("CK_Review_Rate", "[Rate] BETWEEN 1 AND 5");
+            e.ToTable(tb => tb.HasCheckConstraint("CK_Review_Rate", "[Rate] BETWEEN 1 AND 5"));
 
             e.HasOne(x => x.Booking)
                 .WithOne(x => x.Review)

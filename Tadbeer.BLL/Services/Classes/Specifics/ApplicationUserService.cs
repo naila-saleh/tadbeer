@@ -285,6 +285,23 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         return user.Adapt<WorkerPublicProfileResponseDto>();
     }
 
+    public async Task<AdminUserIdentityVerificationResponseDto?> GetAdminUserIdentityVerificationAsync(Guid id)
+    {
+        var user = await _unitOfWork.ApplicationUsers.GetByIdWithWorkImagesAsync(id);
+        if (user == null)
+        {
+            return null;
+        }
+
+        return user.Adapt<AdminUserIdentityVerificationResponseDto>();
+    }
+
+    public async Task<IEnumerable<AdminUserIdentityVerificationResponseDto>> GetPendingWorkerIdentityVerificationsAsync()
+    {
+        var users = await _unitOfWork.ApplicationUsers.GetPendingIdentityVerificationWorkersAsync();
+        return users.Adapt<List<AdminUserIdentityVerificationResponseDto>>();
+    }
+
     public async Task<WorkersFilteredResponseDto> GetWorkersByFiltersAsync(WorkerFiltersRequestDto request)
     {
         var safePage = request.Page < 1 ? 1 : request.Page;
@@ -618,6 +635,99 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
         return newMainImage.Adapt<WorkImageCreatedResponseDto>();
     }
 
+    public async Task<WorkerIdentityVerificationStatusResponseDto?> UploadWorkerIdentityImageAsync(Guid userId, WorkerIdentityImageUploadRequestDto request)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
+        {
+            return null;
+        }
+
+        if (request.IdentityImage == null)
+        {
+            throw new UserOperationException("Identity image file is required.");
+        }
+
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+        if (!_fileStorageService.ValidateFile(request.IdentityImage, allowedExtensions, 10 * 1024 * 1024))
+        {
+            throw new UserOperationException("Invalid identity image file. Allowed: jpg, jpeg, png, gif. Max size: 10MB.");
+        }
+
+        if (!string.IsNullOrWhiteSpace(user.IdentityImageUrl))
+        {
+            await _fileStorageService.DeleteFileAsync(user.IdentityImageUrl);
+        }
+
+        user.IdentityImageUrl = await _fileStorageService.SaveFileAsync(request.IdentityImage, "identity-images", user.Id);
+        // Any new upload must be re-reviewed by admin.
+        user.IsIdentityVerified = false;
+        user.IdentityImageRejectionReason = null;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        _unitOfWork.ApplicationUsers.Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return BuildIdentityStatusResponse(user);
+    }
+
+    public async Task<WorkerIdentityVerificationStatusResponseDto?> GetWorkerIdentityVerificationStatusAsync(Guid userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
+        {
+            return null;
+        }
+
+        return BuildIdentityStatusResponse(user);
+    }
+
+    public async Task<WorkerIdentityVerificationStatusResponseDto?> ApproveWorkerIdentityImageAsync(Guid workerId)
+    {
+        var user = await _userManager.FindByIdAsync(workerId.ToString());
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(user.IdentityImageUrl))
+        {
+            throw new UserOperationException("Worker has not uploaded an identity image yet.");
+        }
+
+        user.IsIdentityVerified = true;
+        user.IdentityImageRejectionReason = null;
+        user.UpdatedAt = DateTime.UtcNow;
+
+        _unitOfWork.ApplicationUsers.Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return BuildIdentityStatusResponse(user);
+    }
+
+    public async Task<WorkerIdentityVerificationStatusResponseDto?> RejectWorkerIdentityImageAsync(Guid workerId, AdminRejectWorkerIdentityRequestDto request)
+    {
+        var user = await _userManager.FindByIdAsync(workerId.ToString());
+        if (user == null || !await IsInRoleAsync(user, UserRole.Worker))
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(user.IdentityImageUrl))
+        {
+            throw new UserOperationException("Worker has not uploaded an identity image yet.");
+        }
+
+        user.IsIdentityVerified = false;
+        user.IdentityImageRejectionReason = request.Reason.Trim();
+        user.UpdatedAt = DateTime.UtcNow;
+
+        _unitOfWork.ApplicationUsers.Update(user);
+        await _unitOfWork.CompleteAsync();
+
+        return BuildIdentityStatusResponse(user);
+    }
+
     public async Task<string?> ToggleUserOrWorkerStatusAsync(Guid userId)
     {
         var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -888,5 +998,16 @@ public class ApplicationUserService : GenericService<ApplicationUserRequestDto, 
 
     private static double DegreesToRadians(double value)
         => value * (Math.PI / 180);
+
+    private static WorkerIdentityVerificationStatusResponseDto BuildIdentityStatusResponse(ApplicationUser user)
+    {
+        return new WorkerIdentityVerificationStatusResponseDto
+        {
+            HasIdentityImage = !string.IsNullOrWhiteSpace(user.IdentityImageUrl),
+            IsVerified = user.IsIdentityVerified,
+            IdentityImageUrl = user.IdentityImageUrl,
+            IdentityImageRejectionReason = user.IdentityImageRejectionReason
+        };
+    }
 
 }

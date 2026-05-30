@@ -44,6 +44,9 @@ public static class MapsterConfig
             .Map(dest => dest.PhoneNumbers, src => src.PhoneNumbers)
             .Map(dest => dest.Role, _ => UserRole.User);
 
+        TypeAdapterConfig<ApplicationUser, AdminUserIdentityVerificationResponseDto>
+            .NewConfig();
+
         TypeAdapterConfig<ApplicationUser, UserProfileResponseDto>
             .NewConfig()
             .Map(dest => dest.Email, src => src.Email ?? string.Empty)
@@ -148,6 +151,8 @@ public static class MapsterConfig
                 src => $"{src.User.FirstName} {src.User.LastName}".Trim())
             .Map(dest => dest.WorkerName,
                 src => $"{src.Worker.FirstName} {src.Worker.LastName}".Trim())
+            .Map(dest => dest.SpecialtyId, src => src.SpecialtyId)
+            .Map(dest => dest.SpecialtyName, src => src.Specialty == null ? null : src.Specialty.Name)
             .Map(dest => dest.WorkingDay, src => src.WorkingHour.DayOfWeek)
             .Map(dest => dest.WorkingHourStart, src => src.WorkingHour.StartTime)
             .Map(dest => dest.WorkingHourEnd, src => src.WorkingHour.EndTime);
@@ -167,6 +172,8 @@ public static class MapsterConfig
             .NewConfig()
             .Map(dest => dest.UserId, src => src.Booking.UserId)
             .Map(dest => dest.WorkerId, src => src.Booking.WorkerId)
+            .Map(dest => dest.SpecialtyId, src => src.Booking.SpecialtyId)
+            .Map(dest => dest.SpecialtyName, src => src.Booking.Specialty == null ? null : src.Booking.Specialty.Name)
             .Map(dest => dest.UserName, src => $"{src.Booking.User.FirstName} {src.Booking.User.LastName}".Trim())
             .Map(dest => dest.WorkerName, src => $"{src.Booking.Worker.FirstName} {src.Booking.Worker.LastName}".Trim());
 

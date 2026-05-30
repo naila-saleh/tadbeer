@@ -87,6 +87,47 @@ public class ProfileController : ControllerBase
         return Ok(createdImages);
     }
 
+    [HttpPost("me/identity-picture")]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<WorkerIdentityVerificationStatusResponseDto>> UploadIdentityPicture([FromForm] WorkerIdentityImageUploadRequestDto request)
+    {
+        if (!TryGetCurrentUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+
+        if (request.IdentityImage == null)
+        {
+            request.IdentityImage = CollectFiles("IdentityImage").FirstOrDefault()
+                ?? CollectFiles("IdentityPicture").FirstOrDefault();
+        }
+
+        var status = await _userService.UploadWorkerIdentityImageAsync(userId, request);
+        if (status == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(status);
+    }
+
+    [HttpGet("me/identity-verification")]
+    public async Task<ActionResult<WorkerIdentityVerificationStatusResponseDto>> GetIdentityVerificationStatus()
+    {
+        if (!TryGetCurrentUserId(out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var status = await _userService.GetWorkerIdentityVerificationStatusAsync(userId);
+        if (status == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(status);
+    }
+
     [HttpPost("me/work-images/{mainImageId:guid}/sub-images")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<WorkerProfileResponseDto>> AddSubImagesToMainImage(Guid mainImageId, [FromForm] WorkerMainImageSubImagesRequestDto request)

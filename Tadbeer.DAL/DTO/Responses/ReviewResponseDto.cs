@@ -11,6 +11,9 @@ public class ReviewResponseDto
 	public Guid WorkerId { get; set; }
 	public string WorkerName { get; set; } = string.Empty;
 
+	public Guid? SpecialtyId { get; set; }
+	public string? SpecialtyName { get; set; }
+
 	public byte Rate { get; set; }
 	public string? Comment { get; set; }
 
