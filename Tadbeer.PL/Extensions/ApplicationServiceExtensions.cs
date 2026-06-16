@@ -29,6 +29,7 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IBookingService, BookingService>();
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<IAIDetectionService, AIDetectionService>();
+        services.AddScoped<IGeminiChatService, GeminiChatService>();
         services.AddScoped<IEmailSender, EmailSetting>();
         services.AddScoped<IGenerateJWTService, GenerateJWTService>();
         services.AddScoped<ISeedData, SeedData>();
@@ -43,6 +44,12 @@ public static class ApplicationServiceExtensions
         {
             c.BaseAddress = new Uri("https://projectai-drsx.onrender.com/");
             c.Timeout = TimeSpan.FromMinutes(5);
+        });
+
+        services.AddHttpClient("Gemini", c =>
+        {
+            c.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
+            c.Timeout = TimeSpan.FromSeconds(60);
         });
 
         // Typed HttpClient for Nominatim reverse geocoding (OpenStreetMap)
